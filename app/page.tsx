@@ -96,30 +96,39 @@ export default function App() {
   }, [reservations, searchQuery, statusFilter]);
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="mb-2">حجوزات اللوحات الإعلانية</h1>
-          <p className="text-muted-foreground">
-            إدارة حجوزات عرض اللوحات الإعلانية وتتبع حالتها
+        <div className="mb-8 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-white/20 shadow-xl">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+              حجوزات محطة الحافلات
+            </h1>
+          </div>
+          <p className="text-slate-600 dark:text-slate-300 text-lg">
+            إدارة حجوزات اللوحات الإعلانية بمحطات الحافلات وتتبع حالتها
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
             <Input
               placeholder="البحث بالمعلن أو العميل أو الموقع..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10"
+              className="pr-12 h-12 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-slate-200 dark:border-slate-700 rounded-xl shadow-sm focus:shadow-md transition-all focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectTrigger className="w-full sm:w-[220px] h-12 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-slate-200 dark:border-slate-700 rounded-xl shadow-sm">
               <SelectValue placeholder="تصفية حسب الحالة" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl">
               <SelectItem value="all">جميع الحالات</SelectItem>
               <SelectItem value="waiting">قيد الانتظار</SelectItem>
               <SelectItem value="active">نشط</SelectItem>
@@ -128,8 +137,11 @@ export default function App() {
               <SelectItem value="expired">منتهي</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => setIsFormOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
+          <Button
+            onClick={() => setIsFormOpen(true)}
+            className="h-12 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
+          >
+            <Plus className="h-5 w-5 ml-2" />
             إضافة حجز
           </Button>
         </div>
