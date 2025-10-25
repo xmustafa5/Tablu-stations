@@ -17,27 +17,27 @@ export default function App() {
   const [reservations, setReservations] = useState<Reservation[]>([
     {
       id: "1",
-      advertiserName: "Tech Solutions Inc",
-      customerName: "John Smith",
-      location: "Downtown Main St",
+      advertiserName: "شركة الحلول التقنية",
+      customerName: "أحمد محمد",
+      location: "شارع الرئيسي - وسط المدينة",
       startTime: "2025-10-15T09:00",
       endTime: "2025-10-22T17:00",
       status: "waiting",
     },
     {
       id: "2",
-      advertiserName: "Fashion Brand Co",
-      customerName: "Sarah Johnson",
-      location: "Shopping Mall - North Entrance",
+      advertiserName: "شركة الأزياء العصرية",
+      customerName: "سارة علي",
+      location: "المركز التجاري - المدخل الشمالي",
       startTime: "2025-10-10T08:00",
       endTime: "2025-10-13T20:00",
       status: "ending_soon",
     },
     {
       id: "3",
-      advertiserName: "Local Restaurant",
-      customerName: "Mike Davis",
-      location: "Airport Terminal 2",
+      advertiserName: "مطعم المدينة",
+      customerName: "خالد حسن",
+      location: "مطار المدينة - صالة 2",
       startTime: "2025-09-20T10:00",
       endTime: "2025-10-05T18:00",
       status: "completed",
@@ -99,38 +99,38 @@ export default function App() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="mb-2">Advertising Board Reservations</h1>
+          <h1 className="mb-2">حجوزات اللوحات الإعلانية</h1>
           <p className="text-muted-foreground">
-            Manage your advertising board display reservations and track their status
+            إدارة حجوزات عرض اللوحات الإعلانية وتتبع حالتها
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by advertiser, customer, or location..."
+              placeholder="البحث بالمعلن أو العميل أو الموقع..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pr-10"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="تصفية حسب الحالة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="waiting">Waiting</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="ending_soon">Ending Soon</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="expired">Expired</SelectItem>
+              <SelectItem value="all">جميع الحالات</SelectItem>
+              <SelectItem value="waiting">قيد الانتظار</SelectItem>
+              <SelectItem value="active">نشط</SelectItem>
+              <SelectItem value="ending_soon">ينتهي قريباً</SelectItem>
+              <SelectItem value="completed">مكتمل</SelectItem>
+              <SelectItem value="expired">منتهي</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => setIsFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Reservation
+            <Plus className="h-4 w-4 ml-2" />
+            إضافة حجز
           </Button>
         </div>
 

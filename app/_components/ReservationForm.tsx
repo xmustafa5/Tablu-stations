@@ -79,45 +79,45 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>{editReservation ? "Edit Reservation" : "New Reservation"}</DialogTitle>
+          <DialogTitle>{editReservation ? "تعديل الحجز" : "حجز جديد"}</DialogTitle>
           <DialogDescription>
-            {editReservation ? "Edit the advertising board reservation details." : "Add a new advertising board reservation."}
+            {editReservation ? "تعديل تفاصيل حجز اللوحة الإعلانية." : "إضافة حجز جديد للوحة إعلانية."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="advertiser">Advertiser Name</Label>
+              <Label htmlFor="advertiser">اسم المعلن</Label>
               <Input
                 id="advertiser"
                 value={advertiserName}
                 onChange={(e) => setAdvertiserName(e.target.value)}
-                placeholder="Enter advertiser name"
+                placeholder="أدخل اسم المعلن"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="customer">Customer Name</Label>
+              <Label htmlFor="customer">اسم العميل</Label>
               <Input
                 id="customer"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Enter customer name"
+                placeholder="أدخل اسم العميل"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="location">Board Location</Label>
+              <Label htmlFor="location">موقع اللوحة</Label>
               <Input
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., Downtown Main St, Airport Terminal 2"
+                placeholder="مثال: الشارع الرئيسي - وسط المدينة، صالة 2 بالمطار"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="startTime">Display Start Time</Label>
+              <Label htmlFor="startTime">وقت بداية العرض</Label>
               <Input
                 id="startTime"
                 type="datetime-local"
@@ -127,7 +127,7 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="endTime">Display End Time</Label>
+              <Label htmlFor="endTime">وقت نهاية العرض</Label>
               <Input
                 id="endTime"
                 type="datetime-local"
@@ -137,26 +137,26 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">الحالة</Label>
               <Select value={status} onValueChange={(value) => setStatus(value as ReservationStatus)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="اختر الحالة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="waiting">Waiting</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="ending_soon">Ending Soon</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
+                  <SelectItem value="waiting">قيد الانتظار</SelectItem>
+                  <SelectItem value="active">نشط</SelectItem>
+                  <SelectItem value="ending_soon">ينتهي قريباً</SelectItem>
+                  <SelectItem value="completed">مكتمل</SelectItem>
+                  <SelectItem value="expired">منتهي</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-              Cancel
+              إلغاء
             </Button>
-            <Button type="submit">{editReservation ? "Update" : "Add"} Reservation</Button>
+            <Button type="submit">{editReservation ? "تحديث" : "إضافة"} الحجز</Button>
           </DialogFooter>
         </form>
       </DialogContent>

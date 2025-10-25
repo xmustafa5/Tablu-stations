@@ -21,11 +21,11 @@ const statusConfig: Record<
   ReservationStatus,
   { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
 > = {
-  waiting: { label: "Waiting", variant: "secondary" },
-  active: { label: "Active", variant: "default" },
-  ending_soon: { label: "Ending Soon", variant: "outline" },
-  completed: { label: "Completed", variant: "secondary" },
-  expired: { label: "Expired", variant: "destructive" },
+  waiting: { label: "قيد الانتظار", variant: "secondary" },
+  active: { label: "نشط", variant: "default" },
+  ending_soon: { label: "ينتهي قريباً", variant: "outline" },
+  completed: { label: "مكتمل", variant: "secondary" },
+  expired: { label: "منتهي", variant: "destructive" },
 };
 
 export function ReservationTable({ reservations, onEdit, onDelete }: ReservationTableProps) {
@@ -43,8 +43,8 @@ export function ReservationTable({ reservations, onEdit, onDelete }: Reservation
   if (reservations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-        <p>No reservations found</p>
-        <p className="text-sm mt-2">Click "Add Reservation" to create your first entry</p>
+        <p>لا توجد حجوزات</p>
+        <p className="text-sm mt-2">انقر على "إضافة حجز" لإنشاء أول حجز</p>
       </div>
     );
   }
@@ -54,13 +54,13 @@ export function ReservationTable({ reservations, onEdit, onDelete }: Reservation
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Advertiser</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Start Time</TableHead>
-            <TableHead>End Time</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>المعلن</TableHead>
+            <TableHead>العميل</TableHead>
+            <TableHead>الموقع</TableHead>
+            <TableHead>وقت البداية</TableHead>
+            <TableHead>وقت النهاية</TableHead>
+            <TableHead>الحالة</TableHead>
+            <TableHead className="text-right">الإجراءات</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -77,12 +77,12 @@ export function ReservationTable({ reservations, onEdit, onDelete }: Reservation
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-start gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onEdit(reservation)}
-                    title="Edit reservation"
+                    title="تعديل الحجز"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -90,7 +90,7 @@ export function ReservationTable({ reservations, onEdit, onDelete }: Reservation
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(reservation.id)}
-                    title="Delete reservation"
+                    title="حذف الحجز"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
