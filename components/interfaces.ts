@@ -1,4 +1,4 @@
-import type { TEventColor } from "@/components/types";
+export type ReservationStatus = "waiting" | "active" | "ending_soon" | "completed" | "expired";
 
 export interface IUser {
 	id: string;
@@ -10,9 +10,10 @@ export interface IEvent {
 	id: number;
 	startDate: string;
 	endDate: string;
-	title: string;
-	color: TEventColor;
-	description: string;
+	advertiserName: string;
+	customerName: string;
+	location: string;
+	status: ReservationStatus;
 	user: IUser;
 }
 

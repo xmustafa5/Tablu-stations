@@ -22,9 +22,10 @@ import type { TEventFormData } from "@/components/schemas";
 interface DatePickerProps {
 	form: UseFormReturn<TEventFormData>;
 	field: ControllerRenderProps<TEventFormData, "endDate" | "startDate">;
+	label?: string;
 }
 
-export function DateTimePicker({ form, field }: DatePickerProps) {
+export function DateTimePicker({ form, field, label }: DatePickerProps) {
 	const { use24HourFormat } = useCalendar();
 
 	function handleDateSelect(date: Date | undefined) {
@@ -56,7 +57,7 @@ export function DateTimePicker({ form, field }: DatePickerProps) {
 	return (
 		<FormItem className="flex flex-col">
 			<FormLabel>
-				{field.name === "startDate" ? "Start Date" : "End Date"}
+				{label || (field.name === "startDate" ? "Start Date" : "End Date")}
 			</FormLabel>
 			<Popover modal={true}>
 				<PopoverTrigger asChild>

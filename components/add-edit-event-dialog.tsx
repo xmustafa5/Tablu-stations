@@ -32,7 +32,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { COLORS } from "@/components/constants";
 import { useCalendar } from "@/components/calendar-context";
 import { useDisclosure } from "@/components/hooks";
 import type { IEvent } from "@/components/interfaces";
@@ -84,21 +83,23 @@ export function AddEditEventDialog({
 	const form = useForm<TEventFormData>({
 		resolver: zodResolver(eventSchema),
 		defaultValues: {
-			title: event?.title ?? "",
-			description: event?.description ?? "",
+			advertiserName: event?.advertiserName ?? "",
+			customerName: event?.customerName ?? "",
+			location: event?.location ?? "",
 			startDate: initialDates.startDate,
 			endDate: initialDates.endDate,
-			color: event?.color ?? "blue",
+			status: event?.status ?? "waiting",
 		},
 	});
 
 	useEffect(() => {
 		form.reset({
-			title: event?.title ?? "",
-			description: event?.description ?? "",
+			advertiserName: event?.advertiserName ?? "",
+			customerName: event?.customerName ?? "",
+			location: event?.location ?? "",
 			startDate: initialDates.startDate,
 			endDate: initialDates.endDate,
-			color: event?.color ?? "blue",
+			status: event?.status ?? "waiting",
 		});
 	}, [event, initialDates, form]);
 
@@ -116,22 +117,22 @@ export function AddEditEventDialog({
 							name: "Jeraidi Yassir",
 							picturePath: null,
 						},
-				color: values.color,
+				status: values.status,
 			};
 
 			if (isEditing) {
 				updateEvent(formattedEvent);
-				toast.success("Event updated successfully");
+				toast.success("تم تحديث الحجز بنجاح");
 			} else {
 				addEvent(formattedEvent);
-				toast.success("Event created successfully");
+				toast.success("تم إضافة الحجز بنجاح");
 			}
 
 			onClose();
 			form.reset();
 		} catch (error) {
 			console.error(`Error ${isEditing ? "editing" : "adding"} event:`, error);
-			toast.error(`Failed to ${isEditing ? "edit" : "add"} event`);
+			toast.error(`فشل في ${isEditing ? "تحديث" : "إضافة"} الحجز`);
 		}
 	};
 
@@ -140,11 +141,11 @@ export function AddEditEventDialog({
 			<ModalTrigger asChild>{children}</ModalTrigger>
 			<ModalContent>
 				<ModalHeader>
-					<ModalTitle>{isEditing ? "Edit Event" : "Add New Event"}</ModalTitle>
+					<ModalTitle>{isEditing ? "تعديل الحجز" : "إضافة حجز جديد"}</ModalTitle>
 					<ModalDescription>
 						{isEditing
-							? "Modify your existing event."
-							: "Create a new event for your calendar."}
+							? "تعديل تفاصيل حجز اللوحة الإعلانية."
+							: "إضافة حجز جديد للوحة إعلانية بمحطة الحافلات."}
 					</ModalDescription>
 				</ModalHeader>
 
@@ -156,16 +157,56 @@ export function AddEditEventDialog({
 					>
 						<FormField
 							control={form.control}
-							name="title"
+							name="advertiserName"
 							render={({ field, fieldState }) => (
 								<FormItem>
-									<FormLabel htmlFor="title" className="required">
-										Title
+									<FormLabel htmlFor="advertiserName" className="required">
+										اسم المعلن
 									</FormLabel>
 									<FormControl>
 										<Input
-											id="title"
-											placeholder="Enter a title"
+											id="advertiserName"
+											placeholder="أدخل اسم المعلن"
+											{...field}
+											className={fieldState.invalid ? "border-red-500" : ""}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="customerName"
+							render={({ field, fieldState }) => (
+								<FormItem>
+									<FormLabel htmlFor="customerName" className="required">
+										اسم العميل
+									</FormLabel>
+									<FormControl>
+										<Input
+											id="customerName"
+											placeholder="أدخل اسم العميل"
+											{...field}
+											className={fieldState.invalid ? "border-red-500" : ""}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="location"
+							render={({ field, fieldState }) => (
+								<FormItem>
+									<FormLabel htmlFor="location" className="required">
+										موقع اللوحة
+									</FormLabel>
+									<FormControl>
+										<Input
+											id="location"
+											placeholder="مثال: الشارع الرئيسي - وسط المدينة، صالة 2 بالمطار"
 											{...field}
 											className={fieldState.invalid ? "border-red-500" : ""}
 										/>
@@ -178,22 +219,22 @@ export function AddEditEventDialog({
 							control={form.control}
 							name="startDate"
 							render={({ field }) => (
-								<DateTimePicker form={form} field={field} />
+								<DateTimePicker form={form} field={field} label="وقت البداية" />
 							)}
 						/>
 						<FormField
 							control={form.control}
 							name="endDate"
 							render={({ field }) => (
-								<DateTimePicker form={form} field={field} />
+								<DateTimePicker form={form} field={field} label="وقت النهاية" />
 							)}
 						/>
 						<FormField
 							control={form.control}
-							name="color"
+							name="status"
 							render={({ field, fieldState }) => (
 								<FormItem>
-									<FormLabel className="required">Variant</FormLabel>
+									<FormLabel className="required">الحالة</FormLabel>
 									<FormControl>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<SelectTrigger
@@ -201,38 +242,16 @@ export function AddEditEventDialog({
 													fieldState.invalid ? "border-red-500" : ""
 												}`}
 											>
-												<SelectValue placeholder="Select a variant" />
+												<SelectValue placeholder="اختر الحالة" />
 											</SelectTrigger>
 											<SelectContent>
-												{COLORS.map((color) => (
-													<SelectItem value={color} key={color}>
-														<div className="flex items-center gap-2">
-															<div
-																className={`size-3.5 rounded-full bg-${color}-600 dark:bg-${color}-700`}
-															/>
-															{color}
-														</div>
-													</SelectItem>
-												))}
+												<SelectItem value="waiting">قيد الانتظار</SelectItem>
+												<SelectItem value="active">نشط</SelectItem>
+												<SelectItem value="ending_soon">ينتهي قريباً</SelectItem>
+												<SelectItem value="completed">مكتمل</SelectItem>
+												<SelectItem value="expired">منتهي</SelectItem>
 											</SelectContent>
 										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field, fieldState }) => (
-								<FormItem>
-									<FormLabel className="required">Description</FormLabel>
-									<FormControl>
-										<Textarea
-											{...field}
-											placeholder="Enter a description"
-											className={fieldState.invalid ? "border-red-500" : ""}
-										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -243,11 +262,11 @@ export function AddEditEventDialog({
 				<ModalFooter className="flex justify-end gap-2">
 					<ModalClose asChild>
 						<Button type="button" variant="outline">
-							Cancel
+							إلغاء
 						</Button>
 					</ModalClose>
 					<Button form="event-form" type="submit">
-						{isEditing ? "Save Changes" : "Create Event"}
+						{isEditing ? "حفظ التعديلات" : "إضافة حجز"}
 					</Button>
 				</ModalFooter>
 			</ModalContent>

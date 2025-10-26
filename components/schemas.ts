@@ -1,16 +1,17 @@
 import { z } from "zod";
 
 export const eventSchema = z.object({
-	title: z.string().min(1, "Title is required"),
-	description: z.string().min(1, "Description is required"),
+	advertiserName: z.string().min(1, "اسم المعلن مطلوب"),
+	customerName: z.string().min(1, "اسم العميل مطلوب"),
+	location: z.string().min(1, "موقع اللوحة مطلوب"),
 	startDate: z.date({
-		required_error: "Start date is required",
+		required_error: "وقت البداية مطلوب",
 	}),
 	endDate: z.date({
-		required_error: "End date is required",
+		required_error: "وقت النهاية مطلوب",
 	}),
-	color: z.enum(["blue", "green", "red", "yellow", "purple", "orange"], {
-		required_error: "Variant is required",
+	status: z.enum(["waiting", "active", "ending_soon", "completed", "expired"], {
+		required_error: "الحالة مطلوبة",
 	}),
 });
 

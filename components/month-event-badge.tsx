@@ -13,26 +13,23 @@ const eventBadgeVariants = cva(
 	"mx-1 flex size-auto h-6.5 select-none items-center justify-between gap-1.5 truncate whitespace-nowrap rounded-md border px-2 text-xs",
 	{
 		variants: {
-			color: {
-				// Colored variants
-				blue: "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300",
-				green:
-					"border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300",
-				red: "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300",
-				yellow:
-					"border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
-				purple:
-					"border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300",
-				orange:
-					"border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300",
+			status: {
+				// Status variants
+				waiting: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300",
+				active:
+					"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+				ending_soon: "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300",
+				completed:
+					"border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300",
+				expired:
+					"border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300",
 
 				// Dot variants
-				"blue-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-blue-600",
-				"green-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-green-600",
-				"red-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-red-600",
-				"orange-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-orange-600",
-				"purple-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-purple-600",
-				"yellow-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-yellow-600",
+				"waiting-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-amber-600",
+				"active-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-emerald-600",
+				"ending_soon-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-orange-600",
+				"completed-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-blue-600",
+				"expired-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-red-600",
 			},
 			multiDayPosition: {
 				first:
@@ -44,7 +41,7 @@ const eventBadgeVariants = cva(
 			},
 		},
 		defaultVariants: {
-			color: "blue-dot",
+			status: "waiting-dot",
 		},
 	},
 );
@@ -52,7 +49,7 @@ const eventBadgeVariants = cva(
 interface IProps
 	extends Omit<
 		VariantProps<typeof eventBadgeVariants>,
-		"color" | "multiDayPosition"
+		"status" | "multiDayPosition"
 	> {
 	event: IEvent;
 	cellDate: Date;
@@ -96,12 +93,12 @@ export function MonthEventBadge({
 	const renderBadgeText = ["first", "none"].includes(position) ;
 	const renderBadgeTime =  ["last", "none"].includes(position);
 
-	const color = (
-		badgeVariant === "dot" ? `${event.color}-dot` : event.color
-	) as VariantProps<typeof eventBadgeVariants>["color"];
+	const status = (
+		badgeVariant === "dot" ? `${event.status}-dot` : event.status
+	) as VariantProps<typeof eventBadgeVariants>["status"];
 
 	const eventBadgeClasses = cn(
-		eventBadgeVariants({ color, multiDayPosition: position, className }),
+		eventBadgeVariants({ status, multiDayPosition: position, className }),
 	);
 
 	return (
@@ -111,17 +108,17 @@ export function MonthEventBadge({
 					<div className="flex items-center gap-1.5 truncate">
 						{!["middle", "last"].includes(position) &&
 							badgeVariant === "dot" && (
-								<EventBullet color={event.color} />
+								<EventBullet status={event.status} />
 							)}
 
 						{renderBadgeText && (
 							<p className="flex-1 truncate font-semibold">
 								{eventCurrentDay && (
 									<span className="text-xs">
-										Day {eventCurrentDay} of {eventTotalDays} •{" "}
+										يوم {eventCurrentDay} من {eventTotalDays} •{" "}
 									</span>
 								)}
-								{event.title}
+								{event.advertiserName}
 							</p>
 						)}
 					</div>
