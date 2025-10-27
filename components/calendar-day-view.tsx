@@ -178,7 +178,6 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 
 			<div className="hidden w-72 divide-y border-l md:block">
 				<DayPicker
-					className="mx-auto w-fit"
 					mode="single"
 					selected={selectedDate}
 					onSelect={(date) => date && setSelectedDate(date)}
