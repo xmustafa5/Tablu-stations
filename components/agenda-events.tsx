@@ -1,6 +1,6 @@
-import {format, parseISO} from "date-fns";
-import type {FC} from "react";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import { format, parseISO } from "date-fns";
+import type { FC } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     Command,
     CommandEmpty,
@@ -9,9 +9,9 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command";
-import {cn} from "@/lib/utils";
-import {useCalendar} from "@/components/calendar-context";
-import {EventDetailsDialog} from "@/components/event-details-dialog";
+import { cn } from "@/lib/utils";
+import { useCalendar } from "@/components/calendar-context";
+import { EventDetailsDialog } from "@/components/event-details-dialog";
 import {
     formatTime,
     getBgColor,
@@ -19,10 +19,10 @@ import {
     getFirstLetters,
     toCapitalize,
 } from "@/components/helpers";
-import {EventBullet} from "@/components/event-bullet";
+import { EventBullet } from "@/components/event-bullet";
 
 export const AgendaEvents: FC = () => {
-    const {events, use24HourFormat, badgeVariant, agendaModeGroupBy, selectedDate} =
+    const { events, use24HourFormat, badgeVariant, agendaModeGroupBy, selectedDate } =
         useCalendar();
 
     const monthEvents = getEventsForMonth(events, selectedDate)
@@ -30,6 +30,7 @@ export const AgendaEvents: FC = () => {
     const agendaEvents = Object.groupBy(monthEvents, (event) => {
         return agendaModeGroupBy === "date"
             ? format(parseISO(event.startDate), "yyyy-MM-dd")
+            // @ts-ignore
             : event.color;
     });
 
@@ -40,7 +41,7 @@ export const AgendaEvents: FC = () => {
     return (
         <Command className="py-4 h-[80vh] bg-transparent">
             <div className="mb-4 mx-4">
-                <CommandInput placeholder="Type a command or search..."/>
+                <CommandInput placeholder="Type a command or search..." />
             </div>
             <CommandList className="max-h-max px-3 border-t">
                 {groupedAndSortedEvents.map(([date, groupedEvents]) => (
@@ -49,10 +50,11 @@ export const AgendaEvents: FC = () => {
                         heading={
                             agendaModeGroupBy === "date"
                                 ? format(parseISO(date), "EEEE, MMMM d, yyyy")
+                                // @ts-ignore
                                 : toCapitalize(groupedEvents![0].color)
                         }
                     >
-                        {groupedEvents!.map((event) => (
+                        {groupedEvents!.map((event: any) => (
                             <CommandItem
                                 key={event.id}
                                 className={cn(
@@ -69,10 +71,11 @@ export const AgendaEvents: FC = () => {
                                     <div className="w-full flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-2">
                                             {badgeVariant === "dot" ? (
-                                                <EventBullet color={event.color}/>
+                                                // @ts-ignore
+                                                <EventBullet color={event.color} />
                                             ) : (
                                                 <Avatar>
-                                                    <AvatarImage src="" alt="@shadcn"/>
+                                                    <AvatarImage src="" alt="@shadcn" />
                                                     <AvatarFallback className={getBgColor(event.color)}>
                                                         {getFirstLetters(event.title)}
                                                     </AvatarFallback>

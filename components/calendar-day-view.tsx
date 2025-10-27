@@ -1,7 +1,8 @@
 import { format, isWithinInterval, parseISO } from "date-fns";
-import { Calendar, Clock, User } from "lucide-react";
+import { arSA } from "date-fns/locale";
+import { Calendar as CalendarIcon, Clock, User } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { DayPicker } from "@/components/day-picker";
+import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCalendar } from "@/components/calendar-context";
 
@@ -177,11 +178,11 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 			</div>
 
 			<div className="hidden w-72 divide-y border-l md:block">
-				<DayPicker
+				<Calendar
 					mode="single"
 					selected={selectedDate}
 					onSelect={(date) => date && setSelectedDate(date)}
-					initialFocus
+					locale={arSA}
 				/>
 
 				<div className="flex-1 space-y-3">
@@ -193,16 +194,16 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 							</span>
 
 							<p className="text-sm font-semibold text-t-secondary">
-								Happening now
+								جارٍ الآن
 							</p>
 						</div>
 					) : (
 						<p className="p-4 text-center text-sm italic text-t-tertiary">
-							No appointments or consultations at the moment
+							لا توجد حجوزات نشطة حالياً
 						</p>
 					)}
 
-					{currentEvents.length > 0 && (
+					{/* {currentEvents.length > 0 && (
 						<ScrollArea className="h-[422px] px-4" type="always">
 							<div className="space-y-6 pb-4">
 								{currentEvents.map((event) => {
@@ -211,20 +212,27 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 									return (
 										<div key={event.id} className="space-y-1.5">
 											<p className="line-clamp-2 text-sm font-semibold">
-												{event.title}
+												{event.advertiserName}
 											</p>
+
+											<div className="flex items-center gap-1.5">
+												<User className="size-4 text-t-quinary" />
+												<span className="text-sm text-t-tertiary">
+													{event.customerName}
+												</span>
+											</div>
 
 											{user && (
 												<div className="flex items-center gap-1.5">
 													<User className="size-4 text-t-quinary" />
 													<span className="text-sm text-t-tertiary">
-														{user.name}
+														المسؤول: {user.name}
 													</span>
 												</div>
 											)}
 
 											<div className="flex items-center gap-1.5">
-												<Calendar className="size-4 text-t-quinary" />
+												<CalendarIcon className="size-4 text-t-quinary" />
 												<span className="text-sm text-t-tertiary">
 													{format(new Date(event.startDate), "MMM d, yyyy")}
 												</span>
@@ -249,7 +257,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 								})}
 							</div>
 						</ScrollArea>
-					)}
+					)} */}
 				</div>
 			</div>
 		</div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { enUS } from "date-fns/locale";
+import { arSA } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ComponentProps } from "react";
 import type { CustomComponents } from "react-day-picker";
@@ -25,7 +25,7 @@ function DayPicker({
 					"flex flex-col select-none sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
 				month: "space-y-4",
 
-				caption: "flex justify-center pt-1 relative items-center capitalize",
+				caption: "flex justify-center pt-1 relative items-center",
 				caption_label: "text-sm font-medium",
 
 				nav: "space-x-1 flex items-center",
@@ -33,10 +33,10 @@ function DayPicker({
 					buttonVariants({ variant: "outline" }),
 					"h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
 				),
-				nav_button_previous: "absolute left-1",
-				nav_button_next: "absolute right-1",
+				nav_button_previous: "absolute right-1",
+				nav_button_next: "absolute left-1",
 				head_row: "flex",
-				head_cell: "w-9 font-medium text-sm capitalize",
+				head_cell: "w-9 font-medium text-sm",
 				row: "flex w-full mt-2",
 
 				cell: cn(
@@ -58,11 +58,11 @@ function DayPicker({
 			}}
 			components={
 				{
-					IconLeft: () => <ChevronLeft className="size-4" />,
-					IconRight: () => <ChevronRight className="size-4" />,
+					IconLeft: () => <ChevronRight className="size-4" />,
+					IconRight: () => <ChevronLeft className="size-4" />,
 				} as Partial<CustomComponents>
 			}
-			locale={enUS}
+			locale={arSA}
 			{...props}
 		/>
 	);

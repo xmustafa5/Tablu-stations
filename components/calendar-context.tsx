@@ -130,6 +130,7 @@ export function CalendarProvider({
 		if (newColors.length > 0) {
 			const filtered = allEvents.filter((event) => {
 				const eventColor = event.color || "blue";
+				// @ts-ignore
 				return newColors.includes(eventColor);
 			});
 			setFilteredEvents(filtered);
