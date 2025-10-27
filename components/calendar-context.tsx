@@ -13,8 +13,8 @@ interface ICalendarContext {
 	selectedDate: Date;
 	view: TCalendarView;
 	setView: (view: TCalendarView) => void;
-	agendaModeGroupBy: "date" | "color";
-	setAgendaModeGroupBy: (groupBy: "date" | "color") => void;
+	agendaModeGroupBy: "date" | "status";
+	setAgendaModeGroupBy: (groupBy: "date" | "status") => void;
 	use24HourFormat: boolean;
 	toggleTimeFormat: () => void;
 	setSelectedDate: (date: Date | undefined) => void;
@@ -37,7 +37,7 @@ interface CalendarSettings {
 	badgeVariant: "dot" | "colored";
 	view: TCalendarView;
 	use24HourFormat: boolean;
-	agendaModeGroupBy: "date" | "color";
+	agendaModeGroupBy: "date" | "status";
 }
 
 const DEFAULT_SETTINGS: CalendarSettings = {
@@ -81,7 +81,7 @@ export function CalendarProvider({
 		settings.use24HourFormat,
 	);
 	const [agendaModeGroupBy, setAgendaModeGroupByState] = useState<
-		"date" | "color"
+		"date" | "status"
 	>(settings.agendaModeGroupBy);
 
 	const [selectedDate, setSelectedDate] = useState(new Date());
@@ -116,7 +116,7 @@ export function CalendarProvider({
 		updateSettings({ use24HourFormat: newValue });
 	};
 
-	const setAgendaModeGroupBy = (groupBy: "date" | "color") => {
+	const setAgendaModeGroupBy = (groupBy: "date" | "status") => {
 		setAgendaModeGroupByState(groupBy);
 		updateSettings({ agendaModeGroupBy: groupBy });
 	};

@@ -49,9 +49,9 @@ export function EventListDialog({
                 <ModalHeader>
                     <ModalTitle className="my-2">
                         <div className="flex items-center gap-2">
-                            <EventBullet color={cellEvents[0]?.color} className=""/>
+                            <EventBullet status={cellEvents[0]?.status} className=""/>
                             <p className="text-sm font-medium">
-                                Events on {format(date, "EEEE, MMMM d, yyyy")}
+                                حجوزات يوم {format(date, "EEEE, MMMM d, yyyy")}
                             </p>
                         </div>
                     </ModalTitle>
