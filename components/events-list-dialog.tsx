@@ -64,14 +64,14 @@ export function EventListDialog({
                                     className={cn(
                                         "flex items-center gap-2 p-2 border rounded-md hover:bg-muted cursor-pointer",
                                         {
-                                            [dayCellVariants({color: event.color})]:
+                                            [dayCellVariants({status: event.status})]:
                                                 badgeVariant === "colored",
                                         },
                                     )}
                                 >
-                                        <EventBullet color={event.color}/>
+                                        <EventBullet status={event.status}/>
                                         <div className="flex justify-between items-center w-full">
-                                            <p className="text-sm font-medium">{event.title}</p>
+                                            <p className="text-sm font-medium">{event.advertiserName}</p>
                                             <p className="text-xs">
                                                 {formatTime(event.startDate, use24HourFormat)}
                                             </p>

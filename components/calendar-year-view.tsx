@@ -126,14 +126,14 @@ export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
 																	.map((event) => (
 																		<EventBullet
 																			key={event.id}
-																			color={event.color}
+																			status={event.status}
 																			className="size-1.5"
 																		/>
 																	))
 															) : (
 																<div className="flex flex-col justify-center items-center">
 																	<EventBullet
-																		color={dayEvents[0].color}
+																		status={dayEvents[0].status}
 																		className="size-1.5"
 																	/>
 																	<span className="text-[0.6rem]">

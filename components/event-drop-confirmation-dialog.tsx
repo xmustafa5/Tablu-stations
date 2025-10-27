@@ -66,10 +66,10 @@ export function EventDropConfirmationDialog({
                     <AlertDialogTitle>Confirm Event Move</AlertDialogTitle>
                     <AlertDialogDescription>
                         Are you sure you want to move
-                        <span className={cn(getColorClass(event.color), "mx-1 py-0.5 px-1 rounded-md")}>
-							{event.title}
+                        <span className={cn(getColorClass(event.status), "mx-1 py-0.5 px-1 rounded-md")}>
+							{event.advertiserName}
 						</span>
-                        event from
+                        reservation from
                         <strong className="mx-1">{formatDate(originalStart)}</strong> to
                         <strong className="mx-1">{formatDate(newStartDate)}</strong>?
                     </AlertDialogDescription>

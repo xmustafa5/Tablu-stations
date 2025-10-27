@@ -3,7 +3,7 @@
 import type React from "react";
 import { createContext, useContext, useState } from "react";
 import { useLocalStorage } from "@/components/hooks";
-import type { IEvent, IUser } from "@/components/interfaces";
+import type { IEvent, IUser, ReservationStatus } from "@/components/interfaces";
 import type {
 	TCalendarView,
 	TEventColor,
@@ -22,8 +22,8 @@ interface ICalendarContext {
 	setSelectedUserId: (userId: IUser["id"] | "all") => void;
 	badgeVariant: "dot" | "colored";
 	setBadgeVariant: (variant: "dot" | "colored") => void;
-	selectedColors: TEventColor[];
-	filterEventsBySelectedColors: (colors: TEventColor) => void;
+	selectedColors: ReservationStatus[];
+	filterEventsBySelectedColors: (status: ReservationStatus) => void;
 	filterEventsBySelectedUser: (userId: IUser["id"] | "all") => void;
 	users: IUser[];
 	events: IEvent[];
@@ -88,7 +88,7 @@ export function CalendarProvider({
 	const [selectedUserId, setSelectedUserId] = useState<IUser["id"] | "all">(
 		"all",
 	);
-	const [selectedColors, setSelectedColors] = useState<TEventColor[]>([]);
+	const [selectedColors, setSelectedColors] = useState<ReservationStatus[]>([]);
 
 	const [allEvents, setAllEvents] = useState<IEvent[]>(events || []);
 	const [filteredEvents, setFilteredEvents] = useState<IEvent[]>(events || []);
@@ -121,17 +121,16 @@ export function CalendarProvider({
 		updateSettings({ agendaModeGroupBy: groupBy });
 	};
 
-	const filterEventsBySelectedColors = (color: TEventColor) => {
-		const isColorSelected = selectedColors.includes(color);
+	const filterEventsBySelectedColors = (status: ReservationStatus) => {
+		const isColorSelected = selectedColors.includes(status);
 		const newColors = isColorSelected
-			? selectedColors.filter((c) => c !== color)
-			: [...selectedColors, color];
+			? selectedColors.filter((c) => c !== status)
+			: [...selectedColors, status];
 
 		if (newColors.length > 0) {
 			const filtered = allEvents.filter((event) => {
-				const eventColor = event.color || "blue";
-				// @ts-ignore
-				return newColors.includes(eventColor);
+				const eventStatus = event.status || "waiting";
+				return newColors.includes(eventStatus);
 			});
 			setFilteredEvents(filtered);
 		} else {

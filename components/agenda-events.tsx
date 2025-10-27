@@ -30,8 +30,7 @@ export const AgendaEvents: FC = () => {
     const agendaEvents = Object.groupBy(monthEvents, (event) => {
         return agendaModeGroupBy === "date"
             ? format(parseISO(event.startDate), "yyyy-MM-dd")
-            // @ts-ignore
-            : event.color;
+            : event.status;
     });
 
     const groupedAndSortedEvents = Object.entries(agendaEvents).sort(
@@ -50,8 +49,7 @@ export const AgendaEvents: FC = () => {
                         heading={
                             agendaModeGroupBy === "date"
                                 ? format(parseISO(date), "EEEE, MMMM d, yyyy")
-                                // @ts-ignore
-                                : toCapitalize(groupedEvents![0].color)
+                                : toCapitalize(groupedEvents![0].status)
                         }
                     >
                         {groupedEvents!.map((event: any) => (
@@ -60,7 +58,7 @@ export const AgendaEvents: FC = () => {
                                 className={cn(
                                     "mb-2 p-4 border rounded-md data-[selected=true]:bg-bg transition-all data-[selected=true]:text-none hover:cursor-pointer",
                                     {
-                                        [getColorClass(event.color)]: badgeVariant === "colored",
+                                        [getColorClass(event.status)]: badgeVariant === "colored",
                                         "hover:bg-zinc-200 dark:hover:bg-gray-900":
                                             badgeVariant === "dot",
                                         "hover:opacity-60": badgeVariant === "colored",
@@ -71,13 +69,12 @@ export const AgendaEvents: FC = () => {
                                     <div className="w-full flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-2">
                                             {badgeVariant === "dot" ? (
-                                                // @ts-ignore
-                                                <EventBullet color={event.color} />
+                                                <EventBullet status={event.status} />
                                             ) : (
                                                 <Avatar>
                                                     <AvatarImage src="" alt="@shadcn" />
-                                                    <AvatarFallback className={getBgColor(event.color)}>
-                                                        {getFirstLetters(event.title)}
+                                                    <AvatarFallback className={getBgColor(event.status)}>
+                                                        {getFirstLetters(event.advertiserName)}
                                                     </AvatarFallback>
                                                 </Avatar>
                                             )}
@@ -88,10 +85,10 @@ export const AgendaEvents: FC = () => {
                                                         "text-foreground": badgeVariant === "dot",
                                                     })}
                                                 >
-                                                    {event.title}
+                                                    {event.advertiserName}
                                                 </p>
                                                 <p className="text-muted-foreground text-sm line-clamp-1 text-ellipsis md:text-clip w-1/3">
-                                                    {event.description}
+                                                    {event.location}
                                                 </p>
                                             </div>
                                         </div>

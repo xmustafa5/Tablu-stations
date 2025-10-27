@@ -15,7 +15,6 @@ export interface IEvent {
 	location: string;
 	status: ReservationStatus;
 	user: IUser;
-	color?: string
 }
 
 export interface ICalendarCell {
