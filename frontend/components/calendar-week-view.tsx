@@ -1,4 +1,4 @@
-import {addDays, format, isSameDay, parseISO, startOfWeek} from "date-fns";
+import {addDays, format, isSameDay, parseISO, startOfWeek, startOfDay} from "date-fns";
 import {motion} from "framer-motion";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {
@@ -131,10 +131,9 @@ export function CalendarWeekView({singleDayEvents, multiDayEvents}: IProps) {
                         >
                             <div className="grid grid-cols-7 divide-x">
                                 {weekDays.map((day, dayIndex) => {
-                                    const dayEvents = singleDayEvents.filter(
-                                        (event) =>
-                                            isSameDay(parseISO(event.startDate), day) ||
-                                            isSameDay(parseISO(event.endDate), day),
+                                    // For single-day events in the time grid, only show events that start on this day
+                                    const dayEvents = singleDayEvents.filter((event) =>
+                                        isSameDay(parseISO(event.startDate), day)
                                     );
                                     const groupedEvents = groupEvents(dayEvents);
 

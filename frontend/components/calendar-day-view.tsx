@@ -1,4 +1,4 @@
-import { format, isWithinInterval, parseISO } from "date-fns";
+import { format, isWithinInterval, parseISO, startOfDay, isSameDay } from "date-fns";
 import { arSA } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock, User } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -68,14 +68,10 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 
 	const currentEvents = getCurrentEvents(singleDayEvents);
 
-	const dayEvents = singleDayEvents.filter((event) => {
-		const eventDate = parseISO(event.startDate);
-		return (
-			eventDate.getDate() === selectedDate.getDate() &&
-			eventDate.getMonth() === selectedDate.getMonth() &&
-			eventDate.getFullYear() === selectedDate.getFullYear()
-		);
-	});
+	// For single-day events in the time grid, only show events that start on the selected day
+	const dayEvents = singleDayEvents.filter((event) =>
+		isSameDay(parseISO(event.startDate), selectedDate)
+	);
 
 	const groupedEvents = groupEvents(dayEvents);
 

@@ -1,4 +1,4 @@
-import { getYear, isSameDay, isSameMonth } from "date-fns";
+import { getYear, isSameDay, isSameMonth, startOfDay, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -91,9 +91,13 @@ export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
 								{cells.map((cell) => {
 									const isCurrentMonth = isSameMonth(cell.date, monthDate);
 									const isToday = isSameDay(cell.date, new Date());
-									const dayEvents = allEvents.filter((event) =>
-										isSameDay(new Date(event.startDate), cell.date),
-									);
+									const cellDate = startOfDay(cell.date);
+									const dayEvents = allEvents.filter((event) => {
+										const eventStart = startOfDay(parseISO(event.startDate));
+										const eventEnd = startOfDay(parseISO(event.endDate));
+										// Check if the cell date falls within the event's date range
+										return eventStart <= cellDate && eventEnd >= cellDate;
+									});
 									const hasEvents = dayEvents.length > 0;
 
 									return (

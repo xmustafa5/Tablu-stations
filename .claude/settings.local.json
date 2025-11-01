@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm init)",
+      "Bash(pnpm add:*)",
+      "Bash(npx prisma:*)",
+      "Bash(mkdir:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm prisma:generate:*)",
+      "Bash(find:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm build:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm dev)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

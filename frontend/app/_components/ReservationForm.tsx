@@ -1,13 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -38,12 +31,24 @@ interface ReservationFormProps {
 }
 
 export function ReservationForm({ open, onOpenChange, onSave, editReservation }: ReservationFormProps) {
-  const [advertiserName, setAdvertiserName] = useState(editReservation?.advertiserName || "");
-  const [customerName, setCustomerName] = useState(editReservation?.customerName || "");
-  const [location, setLocation] = useState(editReservation?.location || "");
-  const [startTime, setStartTime] = useState(editReservation?.startTime || "");
-  const [endTime, setEndTime] = useState(editReservation?.endTime || "");
-  const [status, setStatus] = useState<ReservationStatus>(editReservation?.status || "waiting");
+  const [advertiserName, setAdvertiserName] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [location, setLocation] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+
+  // Update form when editReservation changes or dialog opens
+  useEffect(() => {
+    if (open && editReservation) {
+      setAdvertiserName(editReservation.advertiserName);
+      setCustomerName(editReservation.customerName);
+      setLocation(editReservation.location);
+      setStartTime(editReservation.startTime);
+      setEndTime(editReservation.endTime);
+    } else if (open && !editReservation) {
+      resetForm();
+    }
+  }, [open, editReservation]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +58,9 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
       location,
       startTime,
       endTime,
-      status,
+      status: "waiting", // Default status, backend will calculate actual status
     });
-    resetForm();
-    onOpenChange(false);
+    // Don't close dialog here - let the parent component handle it in onSuccess
   };
 
   const resetForm = () => {
@@ -65,7 +69,6 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
     setLocation("");
     setStartTime("");
     setEndTime("");
-    setStatus("waiting");
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -177,26 +180,6 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
                   required
                 />
               </div>
-            </div>
-            <div className="grid gap-2.5">
-              <Label htmlFor="status" className="text-slate-700 dark:text-slate-300 font-semibold text-sm flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                الحالة
-              </Label>
-              <Select value={status} onValueChange={(value) => setStatus(value as ReservationStatus)}>
-                <SelectTrigger className="h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 rounded-lg">
-                  <SelectValue placeholder="اختر الحالة" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="waiting">قيد الانتظار</SelectItem>
-                  <SelectItem value="active">نشط</SelectItem>
-                  <SelectItem value="ending_soon">ينتهي قريباً</SelectItem>
-                  <SelectItem value="completed">مكتمل</SelectItem>
-                  <SelectItem value="expired">منتهي</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
           <DialogFooter className="pt-4 border-t border-slate-200 dark:border-slate-700 gap-3">

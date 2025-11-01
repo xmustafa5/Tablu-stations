@@ -95,7 +95,7 @@ export function ReservationTable({ reservations, onEdit, onDelete }: Reservation
           </TableRow>
         </TableHeader>
         <TableBody>
-          {reservations.map((reservation) => (
+          {reservations?.map((reservation) => (
             <TableRow
               key={reservation.id}
               className="border-b border-slate-200/50 dark:border-slate-700/50 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-colors"
