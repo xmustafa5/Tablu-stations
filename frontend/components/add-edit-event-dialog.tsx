@@ -24,13 +24,6 @@ import {
 	ModalTitle,
 	ModalTrigger,
 } from "@/components/responsive-modal";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCalendar } from "@/components/calendar-context";
 import { useDisclosure } from "@/components/hooks";
@@ -88,7 +81,6 @@ export function AddEditEventDialog({
 			location: event?.location ?? "",
 			startDate: initialDates.startDate,
 			endDate: initialDates.endDate,
-			status: event?.status ?? "waiting",
 		},
 	});
 
@@ -99,7 +91,6 @@ export function AddEditEventDialog({
 			location: event?.location ?? "",
 			startDate: initialDates.startDate,
 			endDate: initialDates.endDate,
-			status: event?.status ?? "waiting",
 		});
 	}, [event, initialDates, form]);
 
@@ -117,7 +108,8 @@ export function AddEditEventDialog({
 							name: "Jeraidi Yassir",
 							picturePath: null,
 						},
-				status: values.status,
+				// Status will be automatically calculated by the backend
+				status: event?.status ?? "waiting",
 			};
 
 			if (isEditing) {
@@ -227,34 +219,6 @@ export function AddEditEventDialog({
 							name="endDate"
 							render={({ field }) => (
 								<DateTimePicker form={form} field={field} label="وقت النهاية" />
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="status"
-							render={({ field, fieldState }) => (
-								<FormItem>
-									<FormLabel className="required">الحالة</FormLabel>
-									<FormControl>
-										<Select value={field.value} onValueChange={field.onChange}>
-											<SelectTrigger
-												className={`w-full ${
-													fieldState.invalid ? "border-red-500" : ""
-												}`}
-											>
-												<SelectValue placeholder="اختر الحالة" />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="waiting">قيد الانتظار</SelectItem>
-												<SelectItem value="active">نشط</SelectItem>
-												<SelectItem value="ending_soon">ينتهي قريباً</SelectItem>
-												<SelectItem value="completed">مكتمل</SelectItem>
-												<SelectItem value="expired">منتهي</SelectItem>
-											</SelectContent>
-										</Select>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
 							)}
 						/>
 					</form>

@@ -36,7 +36,7 @@ export const dayCellVariants = cva("text-white", {
       waiting: "bg-amber-600 dark:bg-amber-500 hover:bg-amber-700 dark:hover:bg-amber-400",
       active:
         "bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400",
-      ending_soon: "bg-orange-600 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-400",
+      ending_soon: "bg-purple-600 dark:bg-purple-500 hover:bg-purple-700 dark:hover:bg-purple-400",
       completed:
         "bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400",
       expired:

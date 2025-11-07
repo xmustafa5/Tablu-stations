@@ -30,6 +30,7 @@ export function EventDetailsDialog({ event, children }: IProps) {
 	const endDate = parseISO(event.endDate);
 	const { use24HourFormat, removeEvent } = useCalendar();
 
+	// Status configuration - backend calculates status dynamically
 	const statusConfig: Record<ReservationStatus, { label: string; className: string }> = {
 		waiting: {
 			label: "قيد الانتظار",

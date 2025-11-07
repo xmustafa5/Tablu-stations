@@ -29,7 +29,8 @@ export function useReservations(params?: ReservationListParams) {
   return useQuery({
     queryKey: reservationKeys.list(params),
     queryFn: () => getReservations(params),
-    staleTime: 30000, // 30 seconds
+    staleTime: 0, // Always refetch on mount and after invalidation
+    refetchOnMount: 'always', // Always refetch when component mounts
   });
 }
 
@@ -52,10 +53,13 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: (data: CreateReservationRequest) => createReservation(data),
-    onSuccess: (response) => {
-      toast.success(response.message || 'Reservation created successfully');
-      // Invalidate and refetch reservations list
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
+    onSuccess: async (response) => {
+      toast.success(response.message || 'تم إنشاء الحجز بنجاح');
+      // Invalidate and refetch reservations list immediately
+      await queryClient.invalidateQueries({
+        queryKey: reservationKeys.lists(),
+        refetchType: 'active' // Refetch all active queries immediately
+      });
     },
     onError: (error: any) => {
       // Handle validation errors
@@ -65,7 +69,7 @@ export function useCreateReservation() {
         });
       } else {
         const errorMessage =
-          error?.response?.data?.message || error?.message || 'Failed to create reservation';
+          error?.response?.data?.message || error?.message || 'فشل في إنشاء الحجز';
         toast.error(errorMessage);
       }
     },
@@ -81,11 +85,19 @@ export function useUpdateReservation() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateReservationRequest }) =>
       updateReservation(id, data),
-    onSuccess: (response, variables) => {
-      toast.success(response.message || 'Reservation updated successfully');
-      // Invalidate specific reservation and lists
-      queryClient.invalidateQueries({ queryKey: reservationKeys.detail(variables.id) });
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
+    onSuccess: async (response, variables) => {
+      toast.success(response.message || 'تم تحديث الحجز بنجاح');
+      // Invalidate specific reservation and lists immediately
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: reservationKeys.detail(variables.id),
+          refetchType: 'active'
+        }),
+        queryClient.invalidateQueries({
+          queryKey: reservationKeys.lists(),
+          refetchType: 'active'
+        })
+      ]);
     },
     onError: (error: any) => {
       // Handle validation errors
@@ -95,7 +107,7 @@ export function useUpdateReservation() {
         });
       } else {
         const errorMessage =
-          error?.response?.data?.message || error?.message || 'Failed to update reservation';
+          error?.response?.data?.message || error?.message || 'فشل في تحديث الحجز';
         toast.error(errorMessage);
       }
     },
@@ -110,14 +122,17 @@ export function useDeleteReservation() {
 
   return useMutation({
     mutationFn: (id: string) => deleteReservation(id),
-    onSuccess: (response) => {
-      toast.success(response.message || 'Reservation deleted successfully');
-      // Invalidate reservations list
-      queryClient.invalidateQueries({ queryKey: reservationKeys.lists() });
+    onSuccess: async (response) => {
+      toast.success(response.message || 'تم حذف الحجز بنجاح');
+      // Invalidate reservations list immediately
+      await queryClient.invalidateQueries({
+        queryKey: reservationKeys.lists(),
+        refetchType: 'active'
+      });
     },
     onError: (error: any) => {
       const errorMessage =
-        error?.response?.data?.message || error?.message || 'Failed to delete reservation';
+        error?.response?.data?.message || error?.message || 'فشل في حذف الحجز';
       toast.error(errorMessage);
     },
   });

@@ -3,6 +3,32 @@ import { AppError } from '../middleware/errorHandler';
 import { ReservationStatus } from '../generated/prisma';
 import conflictCheckerService from './conflictChecker.service';
 
+/**
+ * Calculate the correct status based on current time and reservation times
+ */
+function calculateStatus(startTime: Date, endTime: Date): ReservationStatus {
+  const now = new Date();
+  const twentyFourHoursBeforeEnd = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
+
+  // If end time has passed, it's COMPLETED
+  if (now >= endTime) {
+    return ReservationStatus.COMPLETED;
+  }
+
+  // If current time is before start time, it's WAITING
+  if (now < startTime) {
+    return ReservationStatus.WAITING;
+  }
+
+  // If we're within 24 hours of end time, it's ENDING_SOON
+  if (now >= twentyFourHoursBeforeEnd && now < endTime) {
+    return ReservationStatus.ENDING_SOON;
+  }
+
+  // Otherwise, it's ACTIVE (between start and end, more than 24 hours left)
+  return ReservationStatus.ACTIVE;
+}
+
 export interface CreateReservationInput {
   advertiserName: string;
   customerName: string;
@@ -34,7 +60,7 @@ export interface GetReservationsQuery {
 
 export class ReservationService {
   async createReservation(input: CreateReservationInput) {
-    const { advertiserName, customerName, location, startTime, endTime, status, userId } = input;
+    const { advertiserName, customerName, location, startTime, endTime, userId } = input;
 
     // Validate dates
     if (new Date(startTime) >= new Date(endTime)) {
@@ -48,6 +74,9 @@ export class ReservationService {
       endTime: new Date(endTime),
     });
 
+    // Calculate initial status based on times
+    const calculatedStatus = calculateStatus(new Date(startTime), new Date(endTime));
+
     // Create reservation
     const reservation = await prisma.reservation.create({
       data: {
@@ -56,7 +85,7 @@ export class ReservationService {
         location,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
-        status: status || ReservationStatus.WAITING,
+        status: calculatedStatus,
         userId,
       },
     });
@@ -109,8 +138,21 @@ export class ReservationService {
       },
     });
 
+    // Calculate and update status for each reservation based on current time
+    const reservationsWithUpdatedStatus = reservations.map(reservation => {
+      const calculatedStatus = calculateStatus(reservation.startTime, reservation.endTime);
+      return {
+        ...reservation,
+        status: calculatedStatus,
+      };
+    });
+
+    // Optionally, update the database in the background (fire and forget)
+    // This ensures the DB stays in sync without blocking the response
+    this.updateReservationStatusesInBackground(reservations);
+
     return {
-      reservations,
+      reservations: reservationsWithUpdatedStatus,
       pagination: {
         page,
         limit,
@@ -118,6 +160,31 @@ export class ReservationService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /**
+   * Update reservation statuses in the background (non-blocking)
+   */
+  private async updateReservationStatusesInBackground(reservations: any[]) {
+    try {
+      const updates = reservations.map(reservation => {
+        const calculatedStatus = calculateStatus(reservation.startTime, reservation.endTime);
+        if (reservation.status !== calculatedStatus) {
+          return prisma.reservation.update({
+            where: { id: reservation.id },
+            data: { status: calculatedStatus },
+          });
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (updates.length > 0) {
+        await Promise.all(updates);
+      }
+    } catch (error) {
+      // Silent fail - status calculation in response is more important
+      console.error('Background status update failed:', error);
+    }
   }
 
   async getReservationById(id: string, userId?: string) {
@@ -134,7 +201,21 @@ export class ReservationService {
       throw new AppError('You do not have permission to access this reservation', 403);
     }
 
-    return reservation;
+    // Calculate current status
+    const calculatedStatus = calculateStatus(reservation.startTime, reservation.endTime);
+
+    // Update DB if status changed
+    if (reservation.status !== calculatedStatus) {
+      await prisma.reservation.update({
+        where: { id },
+        data: { status: calculatedStatus },
+      });
+    }
+
+    return {
+      ...reservation,
+      status: calculatedStatus,
+    };
   }
 
   async updateReservation(id: string, userId: string, input: UpdateReservationInput) {

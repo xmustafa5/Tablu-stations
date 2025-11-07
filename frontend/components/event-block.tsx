@@ -19,7 +19,7 @@ const calendarWeekEventCardVariants = cva(
 				waiting: "border-amber-200 bg-amber-100/50 text-amber-700 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950",
 				active:
 					"border-emerald-200 bg-emerald-100/50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-950",
-				ending_soon: "border-orange-200 bg-orange-100/50 text-orange-700 hover:bg-orange-100 dark:border-orange-800 dark:bg-orange-950/50 dark:text-orange-300 dark:hover:bg-orange-950",
+				ending_soon: "border-purple-200 bg-purple-100/50 text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:bg-purple-950",
 				completed:
 					"border-blue-200 bg-blue-100/50 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-950",
 				expired:
@@ -31,7 +31,7 @@ const calendarWeekEventCardVariants = cva(
 				"active-dot":
 					"border-border bg-card text-foreground hover:bg-accent [&_svg]:fill-emerald-600 dark:[&_svg]:fill-emerald-500",
 				"ending_soon-dot":
-					"border-border bg-card text-foreground hover:bg-accent [&_svg]:fill-orange-600 dark:[&_svg]:fill-orange-500",
+					"border-border bg-card text-foreground hover:bg-accent [&_svg]:fill-purple-600 dark:[&_svg]:fill-purple-500",
 				"completed-dot":
 					"border-border bg-card text-foreground hover:bg-accent [&_svg]:fill-blue-600 dark:[&_svg]:fill-blue-500",
 				"expired-dot":

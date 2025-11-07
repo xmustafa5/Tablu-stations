@@ -9,7 +9,7 @@ const eventBulletVariants = cva("size-2 rounded-full", {
 		status: {
 			waiting: "bg-amber-600 dark:bg-amber-500",
 			active: "bg-emerald-600 dark:bg-emerald-500",
-			ending_soon: "bg-orange-600 dark:bg-orange-500",
+			ending_soon: "bg-purple-600 dark:bg-purple-500",
 			completed: "bg-blue-600 dark:bg-blue-500",
 			expired: "bg-red-600 dark:bg-red-500",
 		},

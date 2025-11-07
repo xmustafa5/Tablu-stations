@@ -33,7 +33,7 @@ export default function FilterEvents() {
 	const statusColors: Record<ReservationStatus, string> = {
 		waiting: "amber",
 		active: "emerald",
-		ending_soon: "orange",
+		ending_soon: "purple",
 		completed: "blue",
 		expired: "red",
 	};

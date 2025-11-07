@@ -38,7 +38,7 @@ const statusConfig: Record<
   ending_soon: {
     label: "ينتهي قريباً",
     variant: "outline",
-    className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800"
+    className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800"
   },
   completed: {
     label: "مكتمل",

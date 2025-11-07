@@ -18,7 +18,7 @@ const eventBadgeVariants = cva(
 				waiting: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300",
 				active:
 					"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-				ending_soon: "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300",
+				ending_soon: "border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300",
 				completed:
 					"border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300",
 				expired:
@@ -27,7 +27,7 @@ const eventBadgeVariants = cva(
 				// Dot variants
 				"waiting-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-amber-600",
 				"active-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-emerald-600",
-				"ending_soon-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-orange-600",
+				"ending_soon-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-purple-600",
 				"completed-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-blue-600",
 				"expired-dot": "bg-bg-secondary text-t-primary [&_svg]:fill-red-600",
 			},

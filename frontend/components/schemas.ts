@@ -10,9 +10,8 @@ export const eventSchema = z.object({
 	endDate: z.date({
 		message: "وقت النهاية مطلوب",
 	}),
-	status: z.enum(["waiting", "active", "ending_soon", "completed", "expired"], {
-		message: "الحالة مطلوبة",
-	}),
+	// Status is automatically calculated by the backend based on dates
+	status: z.enum(["waiting", "active", "ending_soon", "completed", "expired"]).optional(),
 });
 
 export type TEventFormData = z.infer<typeof eventSchema>;
