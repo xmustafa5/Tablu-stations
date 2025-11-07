@@ -27,23 +27,32 @@ const ModalOverlay = (props: DialogPrimitive.DialogOverlayProps) => {
 
 const ModalVariants = cva(
 	cn(
-		"fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out",
+		// Base modal styles
+		"fixed z-50 gap-4 bg-background shadow-lg transition ease-in-out",
 		"data-[state=open]:animate-in data-[state=closed]:animate-out",
-		"data-[state=closed]:duration-300 data-[state=open]:duration-500 overflow-y-auto",
-		"lg:left-[50%] lg:top-[50%] lg:w-full lg:max-w-lg lg:translate-x-[-50%] lg:translate-y-[-50%]",
-		"lg:border lg:duration-200 lg:data-[state=open]:animate-in lg:data-[state=closed]:animate-out",
-		"lg:data-[state=closed]:fade-out-0 lg:data-[state=open]:fade-in-0",
-		"lg:data-[state=closed]:zoom-out-95 lg:data-[state=open]:zoom-in-95 lg:rounded-xl",
+		"data-[state=closed]:duration-300 data-[state=open]:duration-500",
+
+		// Mobile: full screen bottom sheet
+		"inset-x-0 bottom-0 border-t rounded-t-2xl",
+		"max-h-[95dvh] overflow-y-auto p-4",
+		"data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+
+		// Desktop: centered dialog
+		"sm:inset-auto sm:left-[50%] sm:top-[50%]",
+		"sm:w-full sm:max-w-lg sm:max-h-[90dvh]",
+		"sm:translate-x-[-50%] sm:translate-y-[-50%]",
+		"sm:border sm:rounded-xl sm:p-6",
+		"sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0",
+		"sm:data-[state=closed]:fade-out-0 sm:data-[state=open]:fade-in-0",
+		"sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
 	),
 	{
 		variants: {
 			side: {
-				top: "inset-x-0 top-0 border-b rounded-b-xl max-h-[80dvh] lg:h-fit data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-				bottom:
-					"inset-x-0 bottom-0 border-t lg:h-fit max-h-[80dvh] rounded-t-xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-				left: "inset-y-0 left-0 h-full lg:h-fit w-3/4 border-r rounded-r-xl data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-				right:
-					"inset-y-0 right-0 h-full lg:h-fit w-3/4 border-l rounded-l-xl data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+				top: "sm:top-[50%] sm:translate-y-[-50%]",
+				bottom: "sm:top-[50%] sm:translate-y-[-50%]",
+				left: "sm:top-[50%] sm:translate-y-[-50%]",
+				right: "sm:top-[50%] sm:translate-y-[-50%]",
 			},
 		},
 		defaultVariants: {
