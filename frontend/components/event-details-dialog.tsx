@@ -19,6 +19,8 @@ import { useCalendar } from "@/components/calendar-context";
 import { AddEditEventDialog } from "@/components/add-edit-event-dialog";
 import { formatTime } from "@/components/helpers";
 import type { IEvent, ReservationStatus } from "@/components/interfaces";
+import { useDeleteReservation } from "@/lib/hooks/use-reservations";
+import { idMapping } from "@/components/calendar";
 
 interface IProps {
 	event: IEvent;
@@ -29,6 +31,7 @@ export function EventDetailsDialog({ event, children }: IProps) {
 	const startDate = parseISO(event.startDate);
 	const endDate = parseISO(event.endDate);
 	const { use24HourFormat, removeEvent } = useCalendar();
+	const deleteMutation = useDeleteReservation();
 
 	// Status configuration - backend calculates status dynamically
 	const statusConfig: Record<ReservationStatus, { label: string; className: string }> = {
@@ -42,7 +45,7 @@ export function EventDetailsDialog({ event, children }: IProps) {
 		},
 		ending_soon: {
 			label: "ينتهي قريباً",
-			className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200"
+			className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200"
 		},
 		completed: {
 			label: "مكتمل",
@@ -55,12 +58,22 @@ export function EventDetailsDialog({ event, children }: IProps) {
 	};
 
 	const deleteEvent = (eventId: number) => {
-		try {
-			removeEvent(eventId);
-			toast.success("تم حذف الحجز بنجاح");
-		} catch {
-			toast.error("خطأ في حذف الحجز");
+		// Get the real UUID from the number ID
+		const realId = idMapping.get(eventId);
+		if (!realId) {
+			toast.error("خطأ: معرّف الحجز غير صالح");
+			return;
 		}
+
+		deleteMutation.mutate(realId, {
+			onSuccess: () => {
+				// Update local calendar state
+				removeEvent(eventId);
+			},
+			onError: (error) => {
+				console.error("Error deleting event:", error);
+			},
+		});
 	};
 
 	return (

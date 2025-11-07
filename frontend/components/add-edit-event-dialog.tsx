@@ -32,6 +32,8 @@ import {
 	eventSchema,
 	type TEventFormData,
 } from "@/components/schemas";
+import { useCreateReservation, useUpdateReservation } from "@/lib/hooks/use-reservations";
+import { idMapping } from "@/components/calendar";
 
 interface IProps {
 	children: ReactNode;
@@ -48,6 +50,8 @@ export function AddEditEventDialog({
 }: IProps) {
 	const { isOpen, onClose, onToggle } = useDisclosure();
 	const { addEvent, updateEvent } = useCalendar();
+	const createMutation = useCreateReservation();
+	const updateMutation = useUpdateReservation();
 	const isEditing = !!event;
 
 	const initialDates = useMemo(() => {
@@ -95,36 +99,58 @@ export function AddEditEventDialog({
 	}, [event, initialDates, form]);
 
 	const onSubmit = (values: TEventFormData) => {
-		try {
-			const formattedEvent: IEvent = {
-				...values,
-				startDate: format(values.startDate, "yyyy-MM-dd'T'HH:mm:ss"),
-				endDate: format(values.endDate, "yyyy-MM-dd'T'HH:mm:ss"),
-				id: isEditing ? event.id : Math.floor(Math.random() * 1000000),
-				user: isEditing
-					? event.user
-					: {
-							id: Math.floor(Math.random() * 1000000).toString(),
-							name: "Jeraidi Yassir",
-							picturePath: null,
-						},
-				// Status will be automatically calculated by the backend
-				status: event?.status ?? "waiting",
-			};
+		const apiData = {
+			advertiserName: values.advertiserName,
+			customerName: values.customerName,
+			location: values.location,
+			startTime: values.startDate.toISOString(),
+			endTime: values.endDate.toISOString(),
+		};
 
-			if (isEditing) {
-				updateEvent(formattedEvent);
-				toast.success("تم تحديث الحجز بنجاح");
-			} else {
-				addEvent(formattedEvent);
-				toast.success("تم إضافة الحجز بنجاح");
+		if (isEditing) {
+			// Get the real UUID from the number ID
+			const realId = idMapping.get(event.id);
+			if (!realId) {
+				toast.error("خطأ: معرّف الحجز غير صالح");
+				return;
 			}
 
-			onClose();
-			form.reset();
-		} catch (error) {
-			console.error(`Error ${isEditing ? "editing" : "adding"} event:`, error);
-			toast.error(`فشل في ${isEditing ? "تحديث" : "إضافة"} الحجز`);
+			updateMutation.mutate(
+				{
+					id: realId,
+					data: apiData,
+				},
+				{
+					onSuccess: () => {
+						// Update local calendar state
+						const formattedEvent: IEvent = {
+							...values,
+							startDate: format(values.startDate, "yyyy-MM-dd'T'HH:mm:ss"),
+							endDate: format(values.endDate, "yyyy-MM-dd'T'HH:mm:ss"),
+							id: event.id,
+							user: event.user,
+							status: event.status,
+						};
+						updateEvent(formattedEvent);
+						onClose();
+						form.reset();
+					},
+					onError: (error) => {
+						console.error("Error updating event:", error);
+					},
+				}
+			);
+		} else {
+			createMutation.mutate(apiData, {
+				onSuccess: () => {
+					// Local state will be updated via query invalidation
+					onClose();
+					form.reset();
+				},
+				onError: (error) => {
+					console.error("Error creating event:", error);
+				},
+			});
 		}
 	};
 

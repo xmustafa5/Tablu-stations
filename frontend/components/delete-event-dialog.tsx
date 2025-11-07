@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useCalendar } from "@/components/calendar-context";
+import { useDeleteReservation } from "@/lib/hooks/use-reservations";
+import { idMapping } from "@/components/calendar";
 
 interface DeleteEventDialogProps {
 	eventId: number;
@@ -20,14 +22,25 @@ interface DeleteEventDialogProps {
 
 export default function DeleteEventDialog({ eventId }: DeleteEventDialogProps) {
 	const { removeEvent } = useCalendar();
+	const deleteMutation = useDeleteReservation();
 
 	const deleteEvent = () => {
-		try {
-			removeEvent(eventId);
-			toast.success("Event deleted successfully.");
-		} catch {
-			toast.error("Error deleting event.");
+		// Get the real UUID from the number ID
+		const realId = idMapping.get(eventId);
+		if (!realId) {
+			toast.error("خطأ: معرّف الحجز غير صالح");
+			return;
 		}
+
+		deleteMutation.mutate(realId, {
+			onSuccess: () => {
+				// Update local calendar state
+				removeEvent(eventId);
+			},
+			onError: (error) => {
+				console.error("Error deleting event:", error);
+			},
+		});
 	};
 
 	if (!eventId) {

@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { useCalendar } from "@/components/calendar-context";
 import type { IEvent } from "@/components/interfaces";
 import { DndConfirmationDialog } from "@/components/dnd-confirmation-dialog";
+import { useUpdateReservation } from "@/lib/hooks/use-reservations";
+import { idMapping } from "@/components/calendar";
 
 interface PendingDropData {
 	event: IEvent;
@@ -47,6 +49,7 @@ export function DndProvider({
 	showConfirmation: showConfirmationProp = false,
 }: DndProviderProps) {
 	const { updateEvent } = useCalendar();
+	const updateMutation = useUpdateReservation();
 	const [dragState, setDragState] = useState<{
 		draggedEvent: IEvent | null;
 		isDragging: boolean;
@@ -163,19 +166,42 @@ export function DndProvider({
 	// Default event update handler
 	const handleEventUpdate = useCallback(
 		(event: IEvent, newStartDate: Date, newEndDate: Date) => {
-			try {
-				const updatedEvent = {
-					...event,
-					startDate: newStartDate.toISOString(),
-					endDate: newEndDate.toISOString(),
-				};
-				updateEvent(updatedEvent);
-				toast.success("Event updated successfully");
-			} catch {
-				toast.error("Failed to update event");
+			// Get the real UUID from the number ID
+			const realId = idMapping.get(event.id);
+			if (!realId) {
+				toast.error("خطأ: معرّف الحجز غير صالح");
+				return;
 			}
+
+			// Call API to update reservation
+			updateMutation.mutate(
+				{
+					id: realId,
+					data: {
+						advertiserName: event.advertiserName,
+						customerName: event.customerName,
+						location: event.location,
+						startTime: newStartDate.toISOString(),
+						endTime: newEndDate.toISOString(),
+					},
+				},
+				{
+					onSuccess: () => {
+						// Update local calendar state
+						const updatedEvent = {
+							...event,
+							startDate: newStartDate.toISOString(),
+							endDate: newEndDate.toISOString(),
+						};
+						updateEvent(updatedEvent);
+					},
+					onError: (error) => {
+						console.error("Error updating event via drag and drop:", error);
+					},
+				}
+			);
 		},
-		[updateEvent],
+		[updateEvent, updateMutation],
 	);
 
 	// Set default callback

@@ -12,8 +12,11 @@ import { motion } from "framer-motion";
 import { Resizable, type ResizeCallback } from "re-resizable";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCalendar } from "@/components/calendar-context";
+import { useUpdateReservation } from "@/lib/hooks/use-reservations";
+import { idMapping } from "@/components/calendar";
 
 import type { IEvent } from "@/components/interfaces";
 
@@ -33,11 +36,16 @@ export function ResizableEvent({
 	className,
 }: ResizableEventBlockProps) {
 	const { updateEvent, use24HourFormat } = useCalendar();
+	const updateMutation = useUpdateReservation();
 
 	const [isResizing, setIsResizing] = useState(false);
 	const [resizePreview, setResizePreview] = useState<{
 		start: string;
 		end: string;
+	} | null>(null);
+	const [pendingUpdate, setPendingUpdate] = useState<{
+		startDate: string;
+		endDate: string;
 	} | null>(null);
 
 	const start = useMemo(() => parseISO(event.startDate), [event.startDate]);
@@ -91,6 +99,13 @@ export function ResizableEvent({
 				end: format(newEnd, use24HourFormat ? "HH:mm" : "h:mm a"),
 			});
 
+			// Store the pending update
+			setPendingUpdate({
+				startDate: newStart.toISOString(),
+				endDate: newEnd.toISOString(),
+			});
+
+			// Update local state for immediate visual feedback
 			updateEvent({
 				...event,
 				startDate: newStart.toISOString(),
@@ -111,7 +126,39 @@ export function ResizableEvent({
 	const handleResizeStop = useCallback(() => {
 		setIsResizing(false);
 		setResizePreview(null);
-	}, []);
+
+		// Call API with the pending update
+		if (pendingUpdate) {
+			const realId = idMapping.get(event.id);
+			if (!realId) {
+				toast.error("خطأ: معرّف الحجز غير صالح");
+				return;
+			}
+
+			updateMutation.mutate(
+				{
+					id: realId,
+					data: {
+						advertiserName: event.advertiserName,
+						customerName: event.customerName,
+						location: event.location,
+						startTime: pendingUpdate.startDate,
+						endTime: pendingUpdate.endDate,
+					},
+				},
+				{
+					onSuccess: () => {
+						// Already updated local state during resize
+						setPendingUpdate(null);
+					},
+					onError: (error) => {
+						console.error("Error updating event via resize:", error);
+						setPendingUpdate(null);
+					},
+				}
+			);
+		}
+	}, [pendingUpdate, event, updateMutation]);
 
 	const resizeConfig = useMemo(
 		() => ({
