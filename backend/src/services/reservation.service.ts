@@ -219,8 +219,8 @@ export class ReservationService {
   }
 
   async updateReservation(id: string, userId: string, input: UpdateReservationInput) {
-    // Check if reservation exists and user owns it
-    const existingReservation = await this.getReservationById(id, userId);
+    // Check if reservation exists (don't check ownership - allow all users to edit)
+    const existingReservation = await this.getReservationById(id);
 
     const newStartTime = input.startTime ? new Date(input.startTime) : existingReservation.startTime;
     const newEndTime = input.endTime ? new Date(input.endTime) : existingReservation.endTime;
@@ -265,8 +265,8 @@ export class ReservationService {
   }
 
   async deleteReservation(id: string, userId: string) {
-    // Check if reservation exists and user owns it
-    await this.getReservationById(id, userId);
+    // Check if reservation exists (don't check ownership - allow all users to delete)
+    await this.getReservationById(id);
 
     // Delete reservation
     await prisma.reservation.delete({

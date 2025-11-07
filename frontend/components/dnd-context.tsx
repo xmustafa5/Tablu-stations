@@ -194,9 +194,25 @@ export function DndProvider({
 							endDate: newEndDate.toISOString(),
 						};
 						updateEvent(updatedEvent);
+						toast.success("تم تحديث الحجز بنجاح");
 					},
-					onError: (error) => {
+					onError: (error: any) => {
 						console.error("Error updating event via drag and drop:", error);
+						// Show validation errors in toast
+						if (error?.response?.data?.errors) {
+							const errors = error.response.data.errors;
+							errors.forEach((err: any) => {
+								toast.error(`${err.field}: ${err.message}`);
+							});
+						} else if (error?.response?.data?.error?.message) {
+							toast.error(error.response.data.error.message);
+						} else if (error?.response?.data?.message) {
+							toast.error(error.response.data.message);
+						} else if (error?.message) {
+							toast.error(error.message);
+						} else {
+							toast.error("فشل تحديث الحجز");
+						}
 					},
 				}
 			);

@@ -37,7 +37,7 @@ export class ReservationController {
         limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
         sortBy: req.query.sortBy as string,
         sortOrder: req.query.sortOrder as 'asc' | 'desc',
-        userId: req.user?.userId,
+        // Don't filter by userId - show all reservations to all users
       });
 
       res.status(200).json({
@@ -121,10 +121,11 @@ export class ReservationController {
       const month = parseInt(req.query.month as string);
       const year = parseInt(req.query.year as string);
 
+      // Don't filter by userId - show all reservations to all users in calendar
       const result = await reservationService.getCalendarReservations(
         month,
         year,
-        req.user?.userId
+        undefined
       );
 
       res.status(200).json({

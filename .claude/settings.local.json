@@ -16,7 +16,12 @@
       "Bash(pnpm build:*)",
       "Bash(cat:*)",
       "Bash(pnpm dev)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(nul)",
+      "Bash(npm run seed:*)",
+      "Bash(npm run prisma:seed:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
