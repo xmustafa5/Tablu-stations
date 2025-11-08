@@ -22,11 +22,11 @@ export class StatisticsController {
     }
   }
 
-  async getRevenueStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getReservationsByStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { startDate, endDate } = req.query;
 
-      const stats = await statisticsService.getRevenueStats(
+      const stats = await statisticsService.getReservationsByStatus(
         startDate ? new Date(startDate as string) : undefined,
         endDate ? new Date(endDate as string) : undefined,
         req.user?.userId

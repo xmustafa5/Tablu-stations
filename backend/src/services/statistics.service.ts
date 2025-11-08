@@ -6,20 +6,17 @@ export interface DashboardStats {
   activeReservations: number;
   completedReservations: number;
   pendingReservations: number;
-  totalRevenue: number;
+  waitingReservations: number;
+  endingSoonReservations: number;
   averageReservationDuration: number;
   occupancyRate: number;
 }
 
-export interface RevenueStats {
-  totalRevenue: number;
-  averageRevenuePerReservation: number;
-  revenueByStatus: Record<ReservationStatus, number>;
-  topLocations: Array<{
-    location: string;
-    revenue: number;
-    count: number;
-  }>;
+export interface ReservationsByStatus {
+  waiting: number;
+  active: number;
+  endingSoon: number;
+  completed: number;
 }
 
 export interface OccupancyStats {
@@ -29,6 +26,7 @@ export interface OccupancyStats {
     occupancyRate: number;
     totalHours: number;
     bookedHours: number;
+    reservationCount: number;
   }>;
 }
 
@@ -65,12 +63,15 @@ export class StatisticsService {
       where: { ...where, status: ReservationStatus.COMPLETED },
     });
 
-    const pendingReservations = await prisma.reservation.count({
-      where: {
-        ...where,
-        status: { in: [ReservationStatus.WAITING, ReservationStatus.ENDING_SOON] },
-      },
+    const waitingReservations = await prisma.reservation.count({
+      where: { ...where, status: ReservationStatus.WAITING },
     });
+
+    const endingSoonReservations = await prisma.reservation.count({
+      where: { ...where, status: ReservationStatus.ENDING_SOON },
+    });
+
+    const pendingReservations = waitingReservations + endingSoonReservations;
 
     // Get all reservations for calculations
     const reservations = await prisma.reservation.findMany({
@@ -82,45 +83,44 @@ export class StatisticsService {
       },
     });
 
-    // Calculate total revenue (assuming $100 per day)
-    const RATE_PER_DAY = 100;
-    let totalRevenue = 0;
+    // Calculate average duration in hours
     let totalDurationHours = 0;
-
     reservations.forEach((reservation) => {
       const durationMs = reservation.endTime.getTime() - reservation.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      totalRevenue += durationDays * RATE_PER_DAY;
       totalDurationHours += durationMs / (1000 * 60 * 60);
     });
 
     const averageReservationDuration =
       reservations.length > 0 ? totalDurationHours / reservations.length : 0;
 
-    // Calculate occupancy rate (simplified)
-    const totalPossibleHours = reservations.length * 24 * 7; // Assume 7 days per week
+    // Calculate occupancy rate (simplified: based on time coverage)
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const periodHours = 30 * 24; // 30 days in hours
+
     const occupancyRate =
-      totalPossibleHours > 0 ? (totalDurationHours / totalPossibleHours) * 100 : 0;
+      periodHours > 0 ? Math.min((totalDurationHours / periodHours) * 100, 100) : 0;
 
     return {
       totalReservations,
       activeReservations,
       completedReservations,
       pendingReservations,
-      totalRevenue: Math.round(totalRevenue * 100) / 100,
+      waitingReservations,
+      endingSoonReservations,
       averageReservationDuration: Math.round(averageReservationDuration * 100) / 100,
       occupancyRate: Math.round(occupancyRate * 100) / 100,
     };
   }
 
   /**
-   * Get revenue statistics
+   * Get reservations breakdown by status
    */
-  async getRevenueStats(
+  async getReservationsByStatus(
     startDate?: Date,
     endDate?: Date,
     userId?: string
-  ): Promise<RevenueStats> {
+  ): Promise<ReservationsByStatus> {
     const where: any = {};
 
     if (userId) {
@@ -133,66 +133,18 @@ export class StatisticsService {
       if (endDate) where.createdAt.lte = endDate;
     }
 
-    const reservations = await prisma.reservation.findMany({
-      where,
-      select: {
-        startTime: true,
-        endTime: true,
-        status: true,
-        location: true,
-      },
-    });
-
-    const RATE_PER_DAY = 100;
-    let totalRevenue = 0;
-    const revenueByStatus: Record<ReservationStatus, number> = {
-      [ReservationStatus.WAITING]: 0,
-      [ReservationStatus.ACTIVE]: 0,
-      [ReservationStatus.ENDING_SOON]: 0,
-      [ReservationStatus.COMPLETED]: 0,
-    };
-
-    const locationRevenue = new Map<string, { revenue: number; count: number }>();
-
-    reservations.forEach((reservation) => {
-      const durationMs = reservation.endTime.getTime() - reservation.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      const revenue = durationDays * RATE_PER_DAY;
-
-      totalRevenue += revenue;
-      revenueByStatus[reservation.status] += revenue;
-
-      const locationData = locationRevenue.get(reservation.location) || {
-        revenue: 0,
-        count: 0,
-      };
-      locationData.revenue += revenue;
-      locationData.count += 1;
-      locationRevenue.set(reservation.location, locationData);
-    });
-
-    const topLocations = Array.from(locationRevenue.entries())
-      .map(([location, data]) => ({
-        location,
-        revenue: Math.round(data.revenue * 100) / 100,
-        count: data.count,
-      }))
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 10);
+    const [waiting, active, endingSoon, completed] = await Promise.all([
+      prisma.reservation.count({ where: { ...where, status: ReservationStatus.WAITING } }),
+      prisma.reservation.count({ where: { ...where, status: ReservationStatus.ACTIVE } }),
+      prisma.reservation.count({ where: { ...where, status: ReservationStatus.ENDING_SOON } }),
+      prisma.reservation.count({ where: { ...where, status: ReservationStatus.COMPLETED } }),
+    ]);
 
     return {
-      totalRevenue: Math.round(totalRevenue * 100) / 100,
-      averageRevenuePerReservation:
-        reservations.length > 0
-          ? Math.round((totalRevenue / reservations.length) * 100) / 100
-          : 0,
-      revenueByStatus: {
-        [ReservationStatus.WAITING]: Math.round(revenueByStatus[ReservationStatus.WAITING] * 100) / 100,
-        [ReservationStatus.ACTIVE]: Math.round(revenueByStatus[ReservationStatus.ACTIVE] * 100) / 100,
-        [ReservationStatus.ENDING_SOON]: Math.round(revenueByStatus[ReservationStatus.ENDING_SOON] * 100) / 100,
-        [ReservationStatus.COMPLETED]: Math.round(revenueByStatus[ReservationStatus.COMPLETED] * 100) / 100,
-      },
-      topLocations,
+      waiting,
+      active,
+      endingSoon,
+      completed,
     };
   }
 
@@ -277,6 +229,7 @@ export class StatisticsService {
         occupancyRate: Math.round((stats.bookedHours / periodHours) * 100 * 100) / 100,
         totalHours: Math.round(periodHours * 100) / 100,
         bookedHours: Math.round(stats.bookedHours * 100) / 100,
+        reservationCount: stats.reservationCount,
       })
     );
 
@@ -306,7 +259,7 @@ export class StatisticsService {
     endDate?: Date,
     userId?: string,
     limit: number = 10
-  ): Promise<Array<{ location: string; count: number; revenue: number }>> {
+  ): Promise<Array<{ location: string; count: number; totalHours: number }>> {
     const where: any = {};
 
     if (userId) {
@@ -328,17 +281,15 @@ export class StatisticsService {
       },
     });
 
-    const RATE_PER_DAY = 100;
-    const locationMap = new Map<string, { count: number; revenue: number }>();
+    const locationMap = new Map<string, { count: number; totalHours: number }>();
 
     reservations.forEach((reservation) => {
       const durationMs = reservation.endTime.getTime() - reservation.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      const revenue = durationDays * RATE_PER_DAY;
+      const durationHours = durationMs / (1000 * 60 * 60);
 
-      const stats = locationMap.get(reservation.location) || { count: 0, revenue: 0 };
+      const stats = locationMap.get(reservation.location) || { count: 0, totalHours: 0 };
       stats.count += 1;
-      stats.revenue += revenue;
+      stats.totalHours += durationHours;
       locationMap.set(reservation.location, stats);
     });
 
@@ -346,7 +297,7 @@ export class StatisticsService {
       .map(([location, stats]) => ({
         location,
         count: stats.count,
-        revenue: Math.round(stats.revenue * 100) / 100,
+        totalHours: Math.round(stats.totalHours * 100) / 100,
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, limit);
@@ -364,7 +315,7 @@ export class StatisticsService {
     Array<{
       period: string;
       count: number;
-      revenue: number;
+      totalDurationHours: number;
     }>
   > {
     const where: any = {
@@ -390,8 +341,7 @@ export class StatisticsService {
       },
     });
 
-    const RATE_PER_DAY = 100;
-    const trendMap = new Map<string, { count: number; revenue: number }>();
+    const trendMap = new Map<string, { count: number; totalDurationHours: number }>();
 
     reservations.forEach((reservation) => {
       const date = reservation.createdAt;
@@ -412,12 +362,11 @@ export class StatisticsService {
       }
 
       const durationMs = reservation.endTime.getTime() - reservation.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      const revenue = durationDays * RATE_PER_DAY;
+      const durationHours = durationMs / (1000 * 60 * 60);
 
-      const stats = trendMap.get(periodKey) || { count: 0, revenue: 0 };
+      const stats = trendMap.get(periodKey) || { count: 0, totalDurationHours: 0 };
       stats.count += 1;
-      stats.revenue += revenue;
+      stats.totalDurationHours += durationHours;
       trendMap.set(periodKey, stats);
     });
 
@@ -425,7 +374,7 @@ export class StatisticsService {
       .map(([period, stats]) => ({
         period,
         count: stats.count,
-        revenue: Math.round(stats.revenue * 100) / 100,
+        totalDurationHours: Math.round(stats.totalDurationHours * 100) / 100,
       }))
       .sort((a, b) => a.period.localeCompare(b.period));
   }

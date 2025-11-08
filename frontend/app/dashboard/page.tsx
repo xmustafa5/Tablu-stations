@@ -85,34 +85,38 @@ export default function DashboardPage() {
                   </div>
                 </Link>
 
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-50 cursor-not-allowed">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                      <BarChart3 className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-                    </div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      Analytics
-                    </h4>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    View statistics and analytics (Coming Soon)
-                  </p>
-                </div>
-
-                {user?.role === 'ADMIN' && (
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-50 cursor-not-allowed">
+                <Link href="/analytics">
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                        <Users className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                        <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <h4 className="font-medium text-gray-900 dark:text-white">
-                        User Management
+                        Analytics
                       </h4>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Manage users and permissions (Coming Soon)
+                      View statistics, trends, and insights
                     </p>
                   </div>
+                </Link>
+
+                {user?.role === 'ADMIN' && (
+                  <Link href="/users">
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
+                          <Users className="h-6 w-6 text-pink-600 dark:text-pink-400" />
+                        </div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          User Management
+                        </h4>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Manage users and permissions
+                      </p>
+                    </div>
+                  </Link>
                 )}
               </div>
             </div>

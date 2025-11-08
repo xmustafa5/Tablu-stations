@@ -98,13 +98,13 @@ export default function CalendarPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button
+            {/* <Button
               onClick={() => setIsFormOpen(true)}
               className="h-10 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
             >
               <Plus className="h-5 w-5 ml-2" />
               إضافة حجز
-            </Button>
+            </Button> */}
             <Link
               href="/list"
               className="flex justify-center items-center gap-2 px-4 py-2 h-10 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors"
@@ -118,12 +118,12 @@ export default function CalendarPage() {
           <Calendar onEventClick={handleEventClick} />
         </Suspense>
 
-        <ReservationForm
+        {/* <ReservationForm
           open={isFormOpen}
           onOpenChange={handleFormOpenChange}
           onSave={handleSaveReservation}
           editReservation={editingReservation}
-        />
+        /> */}
       </div>
     </main>
   );

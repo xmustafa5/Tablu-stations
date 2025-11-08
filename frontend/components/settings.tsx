@@ -54,7 +54,7 @@ export function Settings() {
 				<DropdownMenuLabel>إعدادات التقويم</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>
+					{/* <DropdownMenuItem>
 						<div className="flex items-center justify-between w-full">
 							<span>الوضع الليلي</span>
 							<Switch
@@ -64,7 +64,7 @@ export function Settings() {
 								}
 							/>
 						</div>
-					</DropdownMenuItem>
+					</DropdownMenuItem> */}
 					<DropdownMenuItem>
 						<div className="flex items-center justify-between w-full">
 							<span>تأكيد السحب والإفلات</span>

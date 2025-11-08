@@ -17,7 +17,7 @@ export const dashboardStatsValidator: ValidationChain[] = [
     }),
 ];
 
-export const revenueStatsValidator: ValidationChain[] = [
+export const reservationsByStatusValidator: ValidationChain[] = [
   query('startDate')
     .optional()
     .isISO8601()

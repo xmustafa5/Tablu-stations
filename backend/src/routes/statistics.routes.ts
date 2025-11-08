@@ -4,7 +4,7 @@ import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import {
   dashboardStatsValidator,
-  revenueStatsValidator,
+  reservationsByStatusValidator,
   occupancyStatsValidator,
   popularLocationsValidator,
   trendsValidator,
@@ -29,9 +29,9 @@ router.get(
 );
 
 router.get(
-  '/revenue',
-  validate(revenueStatsValidator),
-  statisticsController.getRevenueStats
+  '/reservations-by-status',
+  validate(reservationsByStatusValidator),
+  statisticsController.getReservationsByStatus
 );
 
 router.get(

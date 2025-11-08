@@ -15,16 +15,23 @@ export interface CustomerMetrics {
   averageReservationsPerCustomer: number;
   topCustomers: Array<{
     userId: string;
+    userName: string;
+    userEmail: string;
     reservationCount: number;
-    totalRevenue: number;
+    totalHours: number;
   }>;
 }
 
 export interface PerformanceMetrics {
-  averageResponseTime: number;
   completionRate: number;
   cancellationRate: number;
   averageLeadTime: number;
+  statusDistribution: {
+    waiting: number;
+    active: number;
+    endingSoon: number;
+    completed: number;
+  };
 }
 
 export class AnalyticsService {
@@ -97,6 +104,12 @@ export class AnalyticsService {
         startTime: true,
         endTime: true,
         createdAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -134,28 +147,28 @@ export class AnalyticsService {
         ? Math.round((reservations.length / totalCustomers) * 100) / 100
         : 0;
 
-    // Calculate top customers by revenue
-    const RATE_PER_DAY = 100;
-    const userRevenue = new Map<string, { count: number; revenue: number }>();
+    // Calculate top customers by total hours and reservation count
+    const userStats = new Map<string, { count: number; totalHours: number; name: string; email: string }>();
 
     reservations.forEach((r) => {
       const durationMs = r.endTime.getTime() - r.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      const revenue = durationDays * RATE_PER_DAY;
+      const durationHours = durationMs / (1000 * 60 * 60);
 
-      const stats = userRevenue.get(r.userId) || { count: 0, revenue: 0 };
+      const stats = userStats.get(r.userId) || { count: 0, totalHours: 0, name: r.user.name, email: r.user.email };
       stats.count += 1;
-      stats.revenue += revenue;
-      userRevenue.set(r.userId, stats);
+      stats.totalHours += durationHours;
+      userStats.set(r.userId, stats);
     });
 
-    const topCustomers = Array.from(userRevenue.entries())
+    const topCustomers = Array.from(userStats.entries())
       .map(([userId, stats]) => ({
         userId,
+        userName: stats.name,
+        userEmail: stats.email,
         reservationCount: stats.count,
-        totalRevenue: Math.round(stats.revenue * 100) / 100,
+        totalHours: Math.round(stats.totalHours * 100) / 100,
       }))
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .sort((a, b) => b.reservationCount - a.reservationCount)
       .slice(0, 10);
 
     return {
@@ -191,7 +204,6 @@ export class AnalyticsService {
       select: {
         status: true,
         startTime: true,
-        endTime: true,
         createdAt: true,
       },
     });
@@ -207,8 +219,10 @@ export class AnalyticsService {
         ? Math.round((completedCount / totalReservations) * 100 * 100) / 100
         : 0;
 
-    // Calculate cancellation rate (assuming non-completed as cancelled for this example)
-    const cancelledCount = totalReservations - completedCount;
+    // Calculate cancellation rate (non-completed and non-active)
+    const cancelledCount = reservations.filter(
+      (r) => r.status !== ReservationStatus.COMPLETED && r.status !== ReservationStatus.ACTIVE
+    ).length;
     const cancellationRate =
       totalReservations > 0
         ? Math.round((cancelledCount / totalReservations) * 100 * 100) / 100
@@ -226,14 +240,19 @@ export class AnalyticsService {
         ? Math.round((totalLeadTimeHours / totalReservations) * 100) / 100
         : 0;
 
-    // Average response time (simplified - using lead time as proxy)
-    const averageResponseTime = averageLeadTime;
+    // Status distribution
+    const statusDistribution = {
+      waiting: reservations.filter((r) => r.status === ReservationStatus.WAITING).length,
+      active: reservations.filter((r) => r.status === ReservationStatus.ACTIVE).length,
+      endingSoon: reservations.filter((r) => r.status === ReservationStatus.ENDING_SOON).length,
+      completed: completedCount,
+    };
 
     return {
-      averageResponseTime,
       completionRate,
       cancellationRate,
       averageLeadTime,
+      statusDistribution,
     };
   }
 
@@ -248,7 +267,7 @@ export class AnalyticsService {
     Array<{
       hour: number;
       reservationCount: number;
-      averageOccupancy: number;
+      averageDurationHours: number;
     }>
   > {
     const where: any = {
@@ -273,10 +292,10 @@ export class AnalyticsService {
     // Initialize hour buckets (0-23)
     const hourStats = new Map<
       number,
-      { count: number; totalOccupancy: number }
+      { count: number; totalDuration: number }
     >();
     for (let i = 0; i < 24; i++) {
-      hourStats.set(i, { count: 0, totalOccupancy: 0 });
+      hourStats.set(i, { count: 0, totalDuration: 0 });
     }
 
     // Count reservations by start hour
@@ -285,19 +304,19 @@ export class AnalyticsService {
       const stats = hourStats.get(hour)!;
       stats.count += 1;
 
-      // Calculate occupancy percentage for this reservation
+      // Calculate duration in hours
       const durationMs = r.endTime.getTime() - r.startTime.getTime();
       const durationHours = durationMs / (1000 * 60 * 60);
-      stats.totalOccupancy += Math.min(durationHours, 24); // Cap at 24 hours
+      stats.totalDuration += durationHours;
     });
 
     return Array.from(hourStats.entries())
       .map(([hour, stats]) => ({
         hour,
         reservationCount: stats.count,
-        averageOccupancy:
+        averageDurationHours:
           stats.count > 0
-            ? Math.round((stats.totalOccupancy / stats.count) * 100) / 100
+            ? Math.round((stats.totalDuration / stats.count) * 100) / 100
             : 0,
       }))
       .sort((a, b) => b.reservationCount - a.reservationCount);
@@ -315,7 +334,7 @@ export class AnalyticsService {
       dayOfWeek: number;
       dayName: string;
       reservationCount: number;
-      revenue: number;
+      totalDurationHours: number;
     }>
   > {
     const where: any = {
@@ -338,13 +357,12 @@ export class AnalyticsService {
       },
     });
 
-    const RATE_PER_DAY = 100;
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     // Initialize day buckets (0-6, Sunday-Saturday)
-    const dayStats = new Map<number, { count: number; revenue: number }>();
+    const dayStats = new Map<number, { count: number; totalDuration: number }>();
     for (let i = 0; i < 7; i++) {
-      dayStats.set(i, { count: 0, revenue: 0 });
+      dayStats.set(i, { count: 0, totalDuration: 0 });
     }
 
     // Count reservations by day of week
@@ -354,8 +372,8 @@ export class AnalyticsService {
       stats.count += 1;
 
       const durationMs = r.endTime.getTime() - r.startTime.getTime();
-      const durationDays = durationMs / (1000 * 60 * 60 * 24);
-      stats.revenue += durationDays * RATE_PER_DAY;
+      const durationHours = durationMs / (1000 * 60 * 60);
+      stats.totalDuration += durationHours;
     });
 
     return Array.from(dayStats.entries())
@@ -363,7 +381,7 @@ export class AnalyticsService {
         dayOfWeek,
         dayName: dayNames[dayOfWeek],
         reservationCount: stats.count,
-        revenue: Math.round(stats.revenue * 100) / 100,
+        totalDurationHours: Math.round(stats.totalDuration * 100) / 100,
       }))
       .sort((a, b) => a.dayOfWeek - b.dayOfWeek);
   }
