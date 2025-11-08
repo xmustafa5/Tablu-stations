@@ -120,6 +120,7 @@ export function UsersTable({
 								className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
 								ref={(el) => {
 									if (el) {
+										// @ts-ignore
 										el.indeterminate = someSelected;
 									}
 								}}
