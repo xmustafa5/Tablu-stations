@@ -33,11 +33,24 @@ enum Role {
   USER
 }
 
+model Location {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reservations Reservation[]
+
+  @@map("locations")
+}
+
 model Reservation {
   id             String            @id @default(uuid())
   advertiserName String
   customerName   String
-  location       String
+  location       String?           // Keep old field temporarily for migration
   startTime      DateTime
   endTime        DateTime
   status         ReservationStatus @default(WAITING)
@@ -47,9 +60,13 @@ model Reservation {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  locationId String?               // Make optional for migration
+  locationRef   Location? @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
   @@index([userId])
   @@index([status])
   @@index([startTime, endTime])
+  @@index([locationId])
   @@map("reservations")
 }
 

@@ -10,6 +10,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useLocations } from "@/lib/hooks/use-locations";
 
 export type ReservationStatus = "waiting" | "active" | "ending_soon" | "completed" | "expired";
 
@@ -36,6 +44,9 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
   const [location, setLocation] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  // Fetch active locations from the API
+  const { data: locations, isLoading: locationsLoading } = useLocations(false);
 
   // Update form when editReservation changes or dialog opens
   useEffect(() => {
@@ -138,14 +149,27 @@ export function ReservationForm({ open, onOpenChange, onSave, editReservation }:
                 </svg>
                 موقع اللوحة
               </Label>
-              <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="مثال: الشارع الرئيسي - وسط المدينة، صالة 2 بالمطار"
-                className="h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg"
-                required
-              />
+              <Select value={location} onValueChange={setLocation} required>
+                <SelectTrigger className="h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg">
+                  <SelectValue placeholder={locationsLoading ? "جاري التحميل..." : "اختر الموقع"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {locationsLoading ? (
+                    <SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+                  ) : locations && locations.length > 0 ? (
+                    locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.name}>
+                        {loc.name}
+                        {loc.description && ` - ${loc.description}`}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-locations" disabled>
+                      لا توجد مواقع متاحة
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="grid gap-2.5">

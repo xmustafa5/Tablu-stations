@@ -10,6 +10,7 @@ import {
   useUpdateReservation,
   useDeleteReservation,
 } from '@/lib/hooks/use-reservations';
+import { useLocations } from '@/lib/hooks/use-locations';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -70,6 +71,9 @@ export default function ReservationsPage() {
     search: search || undefined,
     status: statusFilter || undefined,
   });
+
+  // Fetch active locations
+  const { data: locations, isLoading: locationsLoading } = useLocations(false);
 
   // Mutations
   const createMutation = useCreateReservation();
@@ -398,11 +402,30 @@ export default function ReservationsPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Location</label>
-              <Input
+              <Select
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Enter location"
-              />
+                onValueChange={(value) => setFormData({ ...formData, location: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={locationsLoading ? "Loading..." : "Select location"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {locationsLoading ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : locations && locations.length > 0 ? (
+                    locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.name}>
+                        {loc.name}
+                        {loc.description && ` - ${loc.description}`}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-locations" disabled>
+                      No locations available
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Start Time</label>
@@ -464,11 +487,30 @@ export default function ReservationsPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Location</label>
-              <Input
+              <Select
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Enter location"
-              />
+                onValueChange={(value) => setFormData({ ...formData, location: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={locationsLoading ? "Loading..." : "Select location"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {locationsLoading ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : locations && locations.length > 0 ? (
+                    locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.name}>
+                        {loc.name}
+                        {loc.description && ` - ${loc.description}`}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-locations" disabled>
+                      No locations available
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Start Time</label>

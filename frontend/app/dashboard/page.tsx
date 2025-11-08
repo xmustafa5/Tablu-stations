@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/store/auth-context';
 import { useLogout } from '@/lib/hooks/use-auth-mutations';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Calendar, BarChart3, Users } from 'lucide-react';
+import { LogOut, User, Calendar, BarChart3, Users, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -100,6 +100,24 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </Link>
+
+                {user?.role === 'ADMIN' && (
+                  <Link href="/locations">
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                          <MapPin className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                        </div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          Locations
+                        </h4>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Manage station locations
+                      </p>
+                    </div>
+                  </Link>
+                )}
 
                 {user?.role === 'ADMIN' && (
                   <Link href="/users">

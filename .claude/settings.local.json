@@ -22,7 +22,8 @@
       "Bash(npm run prisma:seed:*)",
       "Bash(npx ts-node:*)",
       "Bash(curl:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(python -m json.tool:*)"
     ],
     "deny": [],
     "ask": []

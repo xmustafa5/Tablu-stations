@@ -31,6 +31,7 @@ import {
 } from "@/lib/hooks/use-reservations";
 import { Reservation as ApiReservation, ReservationStatus as ApiStatus } from "@/lib/types/api.types";
 import type { Reservation, ReservationStatus } from "@/app/_components/ReservationForm";
+import { toast } from "sonner";
 
 // Map API status to local status
 const mapApiStatusToLocal = (apiStatus: ApiStatus): ReservationStatus => {

@@ -124,71 +124,122 @@ export default function AnalyticsPage() {
         </div>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          {/* Dashboard Overview Stats */}
+          {/* Dashboard Overview Stats - ALL DATA */}
           <section>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              نظرة عامة على لوحة التحكم
+              نظرة عامة على لوحة التحكم - جميع الإحصائيات
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Total Reservations */}
               <Card className="border-t-4 border-t-blue-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">إجمالي الحجوزات</CardTitle>
                   <Calendar className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold text-blue-600">
                     {dashboardLoading ? "..." : dashboard?.totalReservations || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    معدل الإشغال: {dashboardLoading ? "..." : `${dashboard?.occupancyRate?.toFixed(1) || 0}%`}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Total Reservations</p>
                 </CardContent>
               </Card>
 
+              {/* Active Reservations */}
               <Card className="border-t-4 border-t-green-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">الحجوزات النشطة</CardTitle>
                   <Activity className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold text-green-600">
                     {dashboardLoading ? "..." : dashboard?.activeReservations || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">قيد التنفيذ حالياً</p>
+                  <p className="text-xs text-muted-foreground mt-1">Active Reservations</p>
                 </CardContent>
               </Card>
 
+              {/* Completed Reservations */}
               <Card className="border-t-4 border-t-purple-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">الحجوزات المكتملة</CardTitle>
                   <CheckCircle className="h-4 w-4 text-purple-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold text-purple-600">
                     {dashboardLoading ? "..." : dashboard?.completedReservations || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    متوسط المدة:{" "}
-                    {dashboardLoading
-                      ? "..."
-                      : `${dashboard?.averageReservationDuration?.toFixed(1) || 0} ساعة`}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Completed Reservations</p>
                 </CardContent>
               </Card>
 
+              {/* Pending Reservations */}
               <Card className="border-t-4 border-t-orange-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">الحجوزات المعلقة</CardTitle>
                   <Clock className="h-4 w-4 text-orange-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold text-orange-600">
                     {dashboardLoading ? "..." : dashboard?.pendingReservations || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    في الانتظار: {dashboardLoading ? "..." : dashboard?.waitingReservations || 0}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Pending Reservations</p>
+                </CardContent>
+              </Card>
+
+              {/* Waiting Reservations */}
+              <Card className="border-t-4 border-t-yellow-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">في الانتظار</CardTitle>
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-yellow-600">
+                    {dashboardLoading ? "..." : dashboard?.waitingReservations || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Waiting Reservations</p>
+                </CardContent>
+              </Card>
+
+              {/* Ending Soon Reservations */}
+              <Card className="border-t-4 border-t-red-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">ينتهي قريباً</CardTitle>
+                  <Activity className="h-4 w-4 text-red-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-red-600">
+                    {dashboardLoading ? "..." : dashboard?.endingSoonReservations || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Ending Soon</p>
+                </CardContent>
+              </Card>
+
+              {/* Average Duration */}
+              <Card className="border-t-4 border-t-indigo-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">متوسط مدة الحجز</CardTitle>
+                  <Clock className="h-4 w-4 text-indigo-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-indigo-600">
+                    {dashboardLoading ? "..." : dashboard?.averageReservationDuration?.toFixed(1) || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">ساعة (Hours)</p>
+                </CardContent>
+              </Card>
+
+              {/* Occupancy Rate */}
+              <Card className="border-t-4 border-t-teal-500">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">معدل الإشغال</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-teal-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-teal-600">
+                    {dashboardLoading ? "..." : `${dashboard?.occupancyRate?.toFixed(1) || 0}%`}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Occupancy Rate</p>
                 </CardContent>
               </Card>
             </div>

@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
 	Modal,
 	ModalClose,
 	ModalContent,
@@ -33,7 +40,11 @@ import {
 	type TEventFormData,
 } from "@/components/schemas";
 import { useCreateReservation, useUpdateReservation } from "@/lib/hooks/use-reservations";
+import { useLocations } from "@/lib/hooks/use-locations";
+import { useAuth } from "@/lib/store/auth-context";
 import { idMapping } from "@/components/calendar";
+import { ReservationStatus as ApiStatus } from "@/lib/types/api.types";
+import type { ReservationStatus } from "@/components/interfaces";
 
 interface IProps {
 	children: ReactNode;
@@ -50,9 +61,22 @@ export function AddEditEventDialog({
 }: IProps) {
 	const { isOpen, onClose, onToggle } = useDisclosure();
 	const { addEvent, updateEvent } = useCalendar();
+	const { user } = useAuth();
 	const createMutation = useCreateReservation();
 	const updateMutation = useUpdateReservation();
+	const { data: locations, isLoading: locationsLoading } = useLocations(false);
 	const isEditing = !!event;
+
+	// Map API status to local status
+	const mapApiStatusToLocal = (apiStatus: ApiStatus): ReservationStatus => {
+		const statusMap: Record<ApiStatus, ReservationStatus> = {
+			[ApiStatus.WAITING]: "waiting",
+			[ApiStatus.ACTIVE]: "active",
+			[ApiStatus.ENDING_SOON]: "ending_soon",
+			[ApiStatus.COMPLETED]: "completed",
+		};
+		return statusMap[apiStatus] || "waiting";
+	};
 
 	const initialDates = useMemo(() => {
 		if (!isEditing && !event) {
@@ -142,8 +166,27 @@ export function AddEditEventDialog({
 			);
 		} else {
 			createMutation.mutate(apiData, {
-				onSuccess: () => {
-					// Local state will be updated via query invalidation
+				onSuccess: (response) => {
+					// Add the new event to local calendar state
+					if (response.data) {
+						const newEvent: IEvent = {
+							id: Math.floor(Math.random() * 1000000), // Temporary number ID for UI
+							advertiserName: response.data.advertiserName,
+							customerName: response.data.customerName,
+							location: response.data.location,
+							startDate: format(new Date(response.data.startTime), "yyyy-MM-dd'T'HH:mm:ss"),
+							endDate: format(new Date(response.data.endTime), "yyyy-MM-dd'T'HH:mm:ss"),
+							user: {
+								id: user?.id || "",
+								name: user?.name || "Unknown",
+								picturePath: null,
+							},
+							status: mapApiStatusToLocal(response.data.status),
+						};
+						// Store mapping of number ID to real UUID
+						idMapping.set(newEvent.id, response.data.id);
+						addEvent(newEvent);
+					}
 					onClose();
 					form.reset();
 				},
@@ -241,12 +284,30 @@ export function AddEditEventDialog({
 										موقع اللوحة
 									</FormLabel>
 									<FormControl>
-										<Input
-											id="location"
-											placeholder="مثال: الشارع الرئيسي - وسط المدينة، صالة 2 بالمطار"
-											{...field}
-											className={`h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg ${fieldState.invalid ? "border-red-500" : ""}`}
-										/>
+										<Select
+											value={field.value}
+											onValueChange={field.onChange}
+										>
+											<SelectTrigger className={`h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg ${fieldState.invalid ? "border-red-500" : ""}`}>
+												<SelectValue placeholder={locationsLoading ? "جاري التحميل..." : "اختر الموقع"} />
+											</SelectTrigger>
+											<SelectContent>
+												{locationsLoading ? (
+													<SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+												) : locations && locations.length > 0 ? (
+													locations.map((loc) => (
+														<SelectItem key={loc.id} value={loc.name}>
+															{loc.name}
+															{loc.description && ` - ${loc.description}`}
+														</SelectItem>
+													))
+												) : (
+													<SelectItem value="no-locations" disabled>
+														لا توجد مواقع متاحة
+													</SelectItem>
+												)}
+											</SelectContent>
+										</Select>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

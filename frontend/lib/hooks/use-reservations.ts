@@ -62,14 +62,38 @@ export function useCreateReservation() {
       });
     },
     onError: (error: any) => {
+      // Handle conflict errors with details
+      const errorData = error?.response?.data?.error || error?.response?.data;
+
+      if (errorData?.message?.includes('conflict') || errorData?.message?.includes('تعارض')) {
+        const details = errorData.details || [];
+        if (details.length > 0) {
+          const conflict = details[0];
+          const timeRange = conflict.timeRange || '';
+          const dates = timeRange.split(' - ');
+          const startDate = dates[0] ? new Date(dates[0]).toLocaleDateString('ar-SA', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          }) : '';
+          const endDate = dates[1] ? new Date(dates[1]).toLocaleDateString('ar-SA', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          }) : '';
+
+          toast.error(
+            `⚠️ تعارض في الوقت!\n\nيوجد حجز موجود:\nالمعلن: ${conflict.advertiser}\nالفترة: ${startDate} - ${endDate}\n\nالرجاء اختيار وقت آخر أو موقع مختلف`,
+            { duration: 7000 }
+          );
+        } else {
+          toast.error(errorData.message || 'يوجد تعارض في الوقت مع حجز آخر');
+        }
+      }
       // Handle validation errors
-      if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+      else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         error.response.data.errors.forEach((err: { field: string; message: string }) => {
           toast.error(`${err.field}: ${err.message}`);
         });
       } else {
         const errorMessage =
-          error?.response?.data?.message || error?.message || 'فشل في إنشاء الحجز';
+          errorData?.message || error?.response?.data?.message || error?.message || 'فشل في إنشاء الحجز';
         toast.error(errorMessage);
       }
     },
@@ -100,14 +124,38 @@ export function useUpdateReservation() {
       ]);
     },
     onError: (error: any) => {
+      // Handle conflict errors with details
+      const errorData = error?.response?.data?.error || error?.response?.data;
+
+      if (errorData?.message?.includes('conflict') || errorData?.message?.includes('تعارض')) {
+        const details = errorData.details || [];
+        if (details.length > 0) {
+          const conflict = details[0];
+          const timeRange = conflict.timeRange || '';
+          const dates = timeRange.split(' - ');
+          const startDate = dates[0] ? new Date(dates[0]).toLocaleDateString('ar-SA', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          }) : '';
+          const endDate = dates[1] ? new Date(dates[1]).toLocaleDateString('ar-SA', {
+            year: 'numeric', month: 'short', day: 'numeric'
+          }) : '';
+
+          toast.error(
+            `⚠️ تعارض في الوقت!\n\nيوجد حجز موجود:\nالمعلن: ${conflict.advertiser}\nالفترة: ${startDate} - ${endDate}\n\nالرجاء اختيار وقت آخر أو موقع مختلف`,
+            { duration: 7000 }
+          );
+        } else {
+          toast.error(errorData.message || 'يوجد تعارض في الوقت مع حجز آخر');
+        }
+      }
       // Handle validation errors
-      if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+      else if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         error.response.data.errors.forEach((err: { field: string; message: string }) => {
           toast.error(`${err.field}: ${err.message}`);
         });
       } else {
         const errorMessage =
-          error?.response?.data?.message || error?.message || 'فشل في تحديث الحجز';
+          errorData?.message || error?.response?.data?.message || error?.message || 'فشل في تحديث الحجز';
         toast.error(errorMessage);
       }
     },
