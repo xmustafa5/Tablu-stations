@@ -21,6 +21,8 @@ export interface LocationFormData {
   name: string;
   description: string;
   isActive: boolean;
+  limit: number;
+  monthlyViewers: number;
 }
 
 interface LocationFormProps {
@@ -35,6 +37,8 @@ export function LocationForm({ open, onOpenChange, onSave, editLocation, isLoadi
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [limit, setLimit] = useState(10);
+  const [monthlyViewers, setMonthlyViewers] = useState(0);
 
   // Update form when editLocation changes or dialog opens
   useEffect(() => {
@@ -42,11 +46,15 @@ export function LocationForm({ open, onOpenChange, onSave, editLocation, isLoadi
       setName(editLocation.name);
       setDescription(editLocation.description || "");
       setIsActive(editLocation.isActive);
+      setLimit(editLocation.limit || 10);
+      setMonthlyViewers(editLocation.monthlyViewers || 0);
     } else if (open && !editLocation) {
       // Reset form for new location
       setName("");
       setDescription("");
       setIsActive(true);
+      setLimit(10);
+      setMonthlyViewers(0);
     }
   }, [open, editLocation]);
 
@@ -56,6 +64,8 @@ export function LocationForm({ open, onOpenChange, onSave, editLocation, isLoadi
       name,
       description,
       isActive,
+      limit,
+      monthlyViewers,
     });
   };
 
@@ -107,6 +117,42 @@ export function LocationForm({ open, onOpenChange, onSave, editLocation, isLoadi
               placeholder="وصف مختصر للموقع"
               rows={3}
               className="bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg resize-none"
+            />
+          </div>
+          <div className="grid gap-2.5">
+            <Label htmlFor="limit" className="text-slate-700 dark:text-slate-300 font-semibold text-sm flex items-center gap-2">
+              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              الحد الأقصى للحجوزات المتزامنة *
+            </Label>
+            <Input
+              id="limit"
+              type="number"
+              min="1"
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              required
+              placeholder="10"
+              className="h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg"
+            />
+          </div>
+          <div className="grid gap-2.5">
+            <Label htmlFor="monthlyViewers" className="text-slate-700 dark:text-slate-300 font-semibold text-sm flex items-center gap-2">
+              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              عدد المشاهدين الشهري
+            </Label>
+            <Input
+              id="monthlyViewers"
+              type="number"
+              min="0"
+              value={monthlyViewers}
+              onChange={(e) => setMonthlyViewers(Number(e.target.value))}
+              placeholder="0"
+              className="h-11 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 rounded-lg"
             />
           </div>
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">

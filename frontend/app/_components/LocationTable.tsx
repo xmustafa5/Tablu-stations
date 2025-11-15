@@ -7,13 +7,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, CheckCircle, XCircle, Activity } from "lucide-react";
+import { Edit, Trash2, CheckCircle, XCircle, Activity, Eye, Users } from "lucide-react";
 
 export interface Location {
   id: string;
   name: string;
   description: string | null;
   isActive: boolean;
+  limit?: number;
+  monthlyViewers?: number;
   _count?: {
     reservations: number;
   };
@@ -50,6 +52,8 @@ export function LocationTable({ locations, onEdit, onDelete }: LocationTableProp
           <TableRow className="bg-linear-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b border-slate-200 dark:border-slate-700 hover:bg-linear-to-r hover:from-blue-50/50 hover:to-indigo-50/50">
             <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">الاسم</TableHead>
             <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">الوصف</TableHead>
+            <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">الحد الأقصى</TableHead>
+            <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">المشاهدات الشهرية</TableHead>
             <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">الحالة</TableHead>
             <TableHead className="text-slate-700 dark:text-slate-300 font-bold text-base">عدد الحجوزات</TableHead>
             <TableHead className="text-left text-slate-700 dark:text-slate-300 font-bold text-base">الإجراءات</TableHead>
@@ -66,6 +70,18 @@ export function LocationTable({ locations, onEdit, onDelete }: LocationTableProp
               </TableCell>
               <TableCell className="text-slate-700 dark:text-slate-300">
                 {location.description || "-"}
+              </TableCell>
+              <TableCell>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 font-semibold text-sm border border-purple-200 dark:border-purple-800">
+                  <Users className="h-4 w-4" />
+                  {location.limit || 10}
+                </span>
+              </TableCell>
+              <TableCell>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 font-semibold text-sm border border-indigo-200 dark:border-indigo-800">
+                  <Eye className="h-4 w-4" />
+                  {(location.monthlyViewers || 0).toLocaleString()}
+                </span>
               </TableCell>
               <TableCell>
                 {location.isActive ? (

@@ -41,11 +41,13 @@ export class LocationController {
    */
   async createLocation(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { name, description, isActive } = req.body;
+      const { name, description, isActive, limit, monthlyViewers } = req.body;
       const location = await locationService.createLocation({
         name,
         description,
         isActive,
+        limit,
+        monthlyViewers,
       });
 
       res.status(201).json({
@@ -64,12 +66,14 @@ export class LocationController {
   async updateLocation(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const { name, description, isActive } = req.body;
+      const { name, description, isActive, limit, monthlyViewers } = req.body;
 
       const location = await locationService.updateLocation(id, {
         name,
         description,
         isActive,
+        limit,
+        monthlyViewers,
       });
 
       res.status(200).json({

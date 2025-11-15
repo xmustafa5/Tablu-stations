@@ -5,12 +5,16 @@ export interface CreateLocationDto {
   name: string;
   description?: string;
   isActive?: boolean;
+  limit?: number;
+  monthlyViewers?: number;
 }
 
 export interface UpdateLocationDto {
   name?: string;
   description?: string;
   isActive?: boolean;
+  limit?: number;
+  monthlyViewers?: number;
 }
 
 export interface LocationResponse {
@@ -18,6 +22,8 @@ export interface LocationResponse {
   name: string;
   description: string | null;
   isActive: boolean;
+  limit: number;
+  monthlyViewers: number;
   createdAt: Date;
   updatedAt: Date;
   _count?: {
@@ -81,6 +87,8 @@ export class LocationService {
         name: data.name,
         description: data.description,
         isActive: data.isActive ?? true,
+        limit: data.limit ?? 10,
+        monthlyViewers: data.monthlyViewers ?? 0,
       },
       include: {
         _count: {
@@ -122,6 +130,8 @@ export class LocationService {
         ...(data.name && { name: data.name }),
         ...(data.description !== undefined && { description: data.description }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
+        ...(data.limit !== undefined && { limit: data.limit }),
+        ...(data.monthlyViewers !== undefined && { monthlyViewers: data.monthlyViewers }),
       },
       include: {
         _count: {

@@ -15,6 +15,7 @@ import statusRoutes from './routes/status.routes';
 import statisticsRoutes from './routes/statistics.routes';
 import userRoutes from './routes/user.routes';
 import locationRoutes from './routes/location.routes';
+import viewerStatisticsRoutes from './routes/viewerStatistics.routes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -60,6 +61,7 @@ app.use('/api/v1/status', statusRoutes);
 app.use('/api/v1/statistics', statisticsRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/locations', locationRoutes);
+app.use('/api/v1/viewer-statistics', viewerStatisticsRoutes);
 
 // Error handling middleware (should be last)
 app.use(errorHandler);

@@ -15,6 +15,7 @@ import {
   useDayOfWeekAnalysis,
   useForecast,
 } from "@/lib/hooks/use-analytics";
+import { LocationCapacityStatus } from "@/app/_components/LocationCapacityStatus";
 import {
   BarChart,
   Bar,
@@ -709,6 +710,15 @@ export default function AnalyticsPage() {
                 )}
               </CardContent>
             </Card>
+          </section>
+
+          {/* Location Capacity Status */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              حالة سعة المواقع
+            </h2>
+            <LocationCapacityStatus />
           </section>
         </main>
       </div>

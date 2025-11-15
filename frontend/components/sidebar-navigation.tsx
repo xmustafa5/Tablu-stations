@@ -10,6 +10,7 @@ import {
   MapPin,
   Users,
   BarChart3,
+  Calculator,
   LogOut,
   ChevronRight,
 } from "lucide-react";
@@ -42,6 +43,16 @@ const navItems: NavItem[] = [
     name: "المواقع",
     href: "/locations",
     icon: MapPin,
+  },
+  {
+    name: "التحليلات",
+    href: "/analytics",
+    icon: BarChart3,
+  },
+  {
+    name: "حاسبة التكلفة",
+    href: "/cost-calculator",
+    icon: Calculator,
   },
   {
     name: "المستخدمين",

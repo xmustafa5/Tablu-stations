@@ -1,7 +1,6 @@
 import prisma from '../utils/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { ReservationStatus } from '../generated/prisma';
-import conflictCheckerService from './conflictChecker.service';
 
 /**
  * Calculate the correct status based on current time and reservation times
@@ -67,12 +66,60 @@ export class ReservationService {
       throw new AppError('End time must be after start time', 400);
     }
 
-    // Check for conflicts
-    await conflictCheckerService.validateNoConflicts({
-      location,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+    // Conflict checking removed - multiple reservations allowed on same location at same time
+
+    // Check if location has reached its reservation limit
+    const locationRecord = await prisma.location.findUnique({
+      where: { name: location },
+      include: {
+        _count: {
+          select: {
+            reservations: true,
+          },
+        },
+      },
     });
+
+    if (!locationRecord) {
+      throw new AppError('Location not found', 404);
+    }
+
+    // Count active reservations overlapping with the requested time slot
+    const overlappingReservations = await prisma.reservation.count({
+      where: {
+        location,
+        status: {
+          in: [ReservationStatus.WAITING, ReservationStatus.ACTIVE, ReservationStatus.ENDING_SOON],
+        },
+        OR: [
+          {
+            AND: [
+              { startTime: { lte: new Date(startTime) } },
+              { endTime: { gt: new Date(startTime) } },
+            ],
+          },
+          {
+            AND: [
+              { startTime: { lt: new Date(endTime) } },
+              { endTime: { gte: new Date(endTime) } },
+            ],
+          },
+          {
+            AND: [
+              { startTime: { gte: new Date(startTime) } },
+              { endTime: { lte: new Date(endTime) } },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (overlappingReservations >= locationRecord.limit) {
+      throw new AppError(
+        `Location has reached its maximum limit of ${locationRecord.limit} concurrent reservations`,
+        400
+      );
+    }
 
     // Calculate initial status based on times
     const calculatedStatus = calculateStatus(new Date(startTime), new Date(endTime));
@@ -83,6 +130,7 @@ export class ReservationService {
         advertiserName,
         customerName,
         location,
+        locationId: locationRecord.id, // Set the foreign key for relation
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         status: calculatedStatus,
@@ -218,13 +266,9 @@ export class ReservationService {
     };
   }
 
-  async updateReservation(id: string, userId: string, input: UpdateReservationInput) {
+  async updateReservation(id: string, _userId: string, input: UpdateReservationInput) {
     // Check if reservation exists (don't check ownership - allow all users to edit)
     const existingReservation = await this.getReservationById(id);
-
-    const newStartTime = input.startTime ? new Date(input.startTime) : existingReservation.startTime;
-    const newEndTime = input.endTime ? new Date(input.endTime) : existingReservation.endTime;
-    const newLocation = input.location || existingReservation.location;
 
     // Validate dates if provided
     if (input.startTime && input.endTime) {
@@ -241,14 +285,18 @@ export class ReservationService {
       }
     }
 
-    // Check for conflicts if time or location changed
-    if (input.startTime || input.endTime || input.location) {
-      await conflictCheckerService.validateNoConflicts({
-        location: newLocation,
-        startTime: newStartTime,
-        endTime: newEndTime,
-        excludeReservationId: id,
+    // Conflict checking removed - multiple reservations allowed on same location at same time
+
+    // If location is being updated, get the locationId
+    let locationId: string | undefined;
+    if (input.location) {
+      const locationRecord = await prisma.location.findUnique({
+        where: { name: input.location },
       });
+      if (!locationRecord) {
+        throw new AppError('Location not found', 404);
+      }
+      locationId = locationRecord.id;
     }
 
     // Update reservation
@@ -256,6 +304,7 @@ export class ReservationService {
       where: { id },
       data: {
         ...input,
+        ...(locationId && { locationId }), // Set the foreign key for relation if location changed
         startTime: input.startTime ? new Date(input.startTime) : undefined,
         endTime: input.endTime ? new Date(input.endTime) : undefined,
       },
@@ -264,7 +313,7 @@ export class ReservationService {
     return updatedReservation;
   }
 
-  async deleteReservation(id: string, userId: string) {
+  async deleteReservation(id: string, _userId: string) {
     // Check if reservation exists (don't check ownership - allow all users to delete)
     await this.getReservationById(id);
 

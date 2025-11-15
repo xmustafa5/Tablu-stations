@@ -62,10 +62,18 @@ export function useCreateReservation() {
       });
     },
     onError: (error: any) => {
-      // Handle conflict errors with details
+      // Handle errors
       const errorData = error?.response?.data?.error || error?.response?.data;
 
-      if (errorData?.message?.includes('conflict') || errorData?.message?.includes('تعارض')) {
+      // Handle location limit reached error
+      if (errorData?.message?.includes('maximum limit') || errorData?.message?.includes('الحد الأقصى')) {
+        toast.error(
+          `⚠️ الموقع ممتلئ!\n\n${errorData.message}\n\nالرجاء اختيار موقع آخر أو وقت مختلف`,
+          { duration: 7000 }
+        );
+      }
+      // Handle conflict errors with details (this is now removed from backend but keeping for legacy)
+      else if (errorData?.message?.includes('conflict') || errorData?.message?.includes('تعارض')) {
         const details = errorData.details || [];
         if (details.length > 0) {
           const conflict = details[0];

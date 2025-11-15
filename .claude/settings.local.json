@@ -23,7 +23,8 @@
       "Bash(npx ts-node:*)",
       "Bash(curl:*)",
       "Bash(npx shadcn@latest add:*)",
-      "Bash(python -m json.tool:*)"
+      "Bash(python -m json.tool:*)",
+      "Bash(timeout 10 npx prisma migrate:*)"
     ],
     "deny": [],
     "ask": []

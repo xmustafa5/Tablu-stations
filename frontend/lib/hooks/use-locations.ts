@@ -17,6 +17,8 @@ export interface Location {
   name: string;
   description: string | null;
   isActive: boolean;
+  limit: number;
+  monthlyViewers: number;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -28,12 +30,16 @@ export interface CreateLocationDto {
   name: string;
   description?: string;
   isActive?: boolean;
+  limit?: number;
+  monthlyViewers?: number;
 }
 
 export interface UpdateLocationDto {
   name?: string;
   description?: string;
   isActive?: boolean;
+  limit?: number;
+  monthlyViewers?: number;
 }
 
 export interface LocationStatistics {

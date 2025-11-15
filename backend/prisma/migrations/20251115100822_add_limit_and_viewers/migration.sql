@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "locations" ADD COLUMN     "limit" INTEGER NOT NULL DEFAULT 10,
+ADD COLUMN     "monthlyViewers" INTEGER NOT NULL DEFAULT 0;
